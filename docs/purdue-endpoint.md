@@ -98,8 +98,21 @@ Cells are `<td class="colN ">` (note trailing space in the class attr).
 - **Parsing:** anchor on `class="reportTable"`; assert the 9 expected `<th>` labels before trusting cell positions — if headers differ, return UNKNOWN (loud failure per CLAUDE.md §9).
 - Responses are ~18KB; cache by `school|subject|course` in `chrome.storage.local`.
 
-## 6. Risks / unknowns still open
+## 6. Stress-test findings (2026-07-11, second pass)
 
-- Elective patterns other than `\dXUND` (and how multi-row results render, e.g. one course → two Purdue courses) — handle defensively, collect fixtures as found.
-- BigIP/WAF may rate-limit bursts — keep the 1 req/sec throttle.
-- `p_ajax` values are echoed into the response (`load_into`) — never reflect them into extension DOM without sanitizing.
+Breaking points discovered by probing — each is a parser/design requirement:
+
+1. **One transfer course → multiple Purdue courses.** Ivy Tech CHEM 105 → `CHM 11510` + `CHM 11520` + `CHM 1XTRA` (3 rows). Continuation rows have `&nbsp;` in the first 5 cells. Parser must group rows: a row with an empty Transfer School cell belongs to the previous course. (`tests/fixtures/batch5.html`)
+2. **Mixed verdicts.** CHEM 105 gets DIRECT (11510/11520) *and* ELECTIVE (1XTRA) credit simultaneously. The CLAUDE.md single-`purdueCourse` result shape is wrong — use `equivalencies: [{subject, number, title, credits, kind}]` with an overall verdict derived (any 5-digit → has direct; only X-codes → elective; etc.).
+3. **Batch POST works — this is free batch mode.** Filling multiple rows returns all results in ONE request. 10 rows accepted (`tests/fixtures/batch10.html`). BUT results come back **sorted alphabetically by subject, not in request order** — match responses by (subject, course) columns, never by index.
+4. **1-row POST silently fails** (returns the no-match page even for a known-good course; likely mod_plsql scalar-vs-array binding). 4, 5, and 10 rows all work. Rule: **always send ≥2 — mirror the real form's 5 unless batching.**
+5. **Inputs are case-sensitive.** `csci` returns an empty course list with HTTP 200 — no error. Uppercase everything before querying.
+6. **Course numbers are not numbers.** `111H`, `101AH`, `063` (leading zero) all exist. Treat as opaque strings end-to-end.
+7. **Cascade presence ≠ articulation exists.** ENGL 111H appears in the `p_ajax` course list but the report returns no table. The fast-path is only trustworthy in the negative direction (absent from list → NONE). Present-but-no-table → show NONE with a "request an evaluation" link (transfercredit@purdue.edu).
+8. **Invalid school code is indistinguishable from no-match** (same no-table page, same byte size). Validate school codes against the fetched list before querying.
+9. **Raw unescaped `&` in titles** ("Anlytc Geomtry&Calc I"). Must parse with a lenient HTML parser (DOMParser/offscreen doc). Never XML parsing, never naive regex on entities.
+10. **Elective code pattern generalizes:** `2XUND`, `1XSCI`, `1XUWC`, `1XTRA` → `^\d X [A-Z]{3}$` (level + X + 3-letter bucket). DIRECT = `^\d{5}$`. Anything else → UNKNOWN, loudly.
+11. **No rate limiting observed** (8-request burst, all 200). Keep the 1 req/sec self-throttle anyway — being unthrottled is not permission.
+12. **MV3 has no `DOMParser` in service workers.** Parse in an offscreen document (`chrome.offscreen`) or in the popup/content-script context.
+13. `p_ajax` echoes `load_into` back into the response — sanitize before any DOM insertion.
+14. BigIP fronted — transient 5xx/affinity flakiness possible; retry once with backoff.
