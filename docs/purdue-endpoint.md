@@ -93,7 +93,11 @@ Cells are `<td class="colN ">` (note trailing space in the class attr).
 ## 5. Implications for the extension
 
 - **No proxy needed.** Host permission for `selfservice.mypurdue.purdue.edu` + plain `fetch` from the MV3 service worker is sufficient. No cookies to carry.
-- **School list can be pre-fetched** per state via `p_ajax` (cheap, cacheable ~30 days) instead of bundling a stale list.
+- **School list can be pre-fetched** per state via `p_ajax` (cheap, cacheable ~30 days).
+  We additionally bundle a **global institution index** (`src/school-index.json`, built by
+  `scripts/build-school-index.mjs` — one throttled scrape of every state + country) so popup
+  search works across the entire articulation universe, not just the selected state.
+  Re-run the script occasionally to refresh; it is metadata (names/codes), not equivalency data.
 - **Course dropdown as pre-check:** before POSTing the report, `p_ajax request_type=course` tells us instantly whether ANY articulation exists — a 1-request fast path for the NONE case.
 - **Parsing:** anchor on `class="reportTable"`; assert the 9 expected `<th>` labels before trusting cell positions — if headers differ, return UNKNOWN (loud failure per CLAUDE.md §9).
 - Responses are ~18KB; cache by `school|subject|course` in `chrome.storage.local`.

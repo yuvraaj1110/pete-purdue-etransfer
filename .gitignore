@@ -4,3 +4,4 @@ dist/
 .DS_Store
 dist-smoke/
 *.zip
+build-index.log

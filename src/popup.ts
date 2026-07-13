@@ -1,5 +1,5 @@
 import { sendBg } from "./messages";
-import { searchSchools } from "./school-map";
+import { searchSchoolIndex, SCHOOL_INDEX, type IndexedSchool } from "./school-index";
 import type { TransferReport, TransferResult } from "./types";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -12,7 +12,8 @@ const coursesTa = $<HTMLTextAreaElement>("courses");
 const checkBtn = $<HTMLButtonElement>("check");
 const resultsDiv = $<HTMLDivElement>("results");
 
-let allSchools: { label: string; value: string }[] = [];
+/** Global search over the bundled index — every school Purdue articulates from. */
+let visibleSchools: IndexedSchool[] = [];
 
 async function loadStates(): Promise<void> {
   const res = await sendBg({ kind: "AJAX_LIST", type: "states", values: [locationSel.value] });
@@ -28,24 +29,31 @@ async function loadStates(): Promise<void> {
   }
 }
 
-async function loadSchools(): Promise<void> {
-  const res = await sendBg({
-    kind: "AJAX_LIST", type: "school", values: [stateSel.value, locationSel.value],
-  });
-  if ("list" in res && res.ok) {
-    allSchools = res.list;
-    renderSchools(allSchools);
-  }
+function schoolsForCurrentState(): IndexedSchool[] {
+  return SCHOOL_INDEX.filter((e) => e.l === locationSel.value && e.s === stateSel.value);
 }
 
-function renderSchools(list: { label: string; value: string }[]): void {
+function renderSchools(list: IndexedSchool[]): void {
+  visibleSchools = list;
   schoolSel.innerHTML = "";
-  for (const s of list) {
+  list.forEach((e, i) => {
     const o = document.createElement("option");
-    o.value = s.value;
-    o.textContent = s.label;
+    o.value = String(i);
+    o.textContent = e.s === stateSel.value ? e.n : `${e.n} (${e.s})`;
     schoolSel.append(o);
+  });
+}
+
+/** Selecting a search hit syncs location + state so the lookup query is correct. */
+async function syncToSelectedSchool(): Promise<IndexedSchool | null> {
+  const e = visibleSchools[Number(schoolSel.value)];
+  if (!e) return null;
+  if (locationSel.value !== e.l) {
+    locationSel.value = e.l;
+    await loadStates();
   }
+  stateSel.value = e.s;
+  return e;
 }
 
 function parseCourseLines(text: string): { subject: string; number: string }[] {
@@ -109,8 +117,9 @@ function render(report: TransferReport): void {
 
 checkBtn.addEventListener("click", async () => {
   const courses = parseCourseLines(coursesTa.value);
-  const schoolCode = schoolSel.value;
-  const schoolName = schoolSel.selectedOptions[0]?.textContent ?? "";
+  const school = await syncToSelectedSchool();
+  const schoolCode = school?.c ?? "";
+  const schoolName = school?.n ?? "";
   if (!courses.length || !schoolCode) {
     resultsDiv.innerHTML = `<div class="err">Pick a school and enter at least one course like “MATH 211”.</div>`;
     return;
@@ -119,7 +128,7 @@ checkBtn.addEventListener("click", async () => {
   checkBtn.textContent = "Checking…";
   try {
     const res = await sendBg({
-      kind: "LOOKUP", location: locationSel.value, state: stateSel.value,
+      kind: "LOOKUP", location: school!.l, state: school!.s,
       schoolCode, schoolName, courses,
     });
     if ("report" in res && res.ok) render(res.report);
@@ -132,24 +141,32 @@ checkBtn.addEventListener("click", async () => {
   }
 });
 
-schoolSearch.addEventListener("input", () => renderSchools(searchSchools(allSchools, schoolSearch.value)));
-locationSel.addEventListener("change", async () => { await loadStates(); await loadSchools(); });
-stateSel.addEventListener("change", loadSchools);
+schoolSearch.addEventListener("input", () => {
+  const q = schoolSearch.value.trim();
+  renderSchools(q ? searchSchoolIndex(q) : schoolsForCurrentState());
+});
+locationSel.addEventListener("change", async () => {
+  await loadStates();
+  renderSchools(schoolsForCurrentState());
+});
+stateSel.addEventListener("change", () => renderSchools(schoolsForCurrentState()));
 
 void (async () => {
   // Pre-fill from active tab: detected school + any highlighted course text
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   await loadStates();
-  await loadSchools();
+  renderSchools(schoolsForCurrentState());
   if (tab?.url) {
     try {
       const host = new URL(tab.url).hostname;
       const res = await sendBg({ kind: "DETECT_SCHOOL", hostname: host });
       if ("school" in res && res.ok && res.school) {
         locationSel.value = res.school.location;
+        await loadStates();
         stateSel.value = res.school.state;
-        await loadSchools();
-        schoolSel.value = res.school.code;
+        renderSchools(schoolsForCurrentState());
+        const i = visibleSchools.findIndex((e) => e.c === res.school!.code);
+        if (i >= 0) schoolSel.value = String(i);
       }
     } catch { /* non-fatal */ }
   }
