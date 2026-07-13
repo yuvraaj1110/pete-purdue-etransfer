@@ -1,20 +1,41 @@
 {
   "manifest_version": 3,
-  "name": "Pete — Purdue e-Transfer (Unofficial)",
+  "name": "Pete \u2014 Purdue e-Transfer (Unofficial)",
   "short_name": "Pete",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Highlight a course on any college site and instantly see if it transfers to Purdue West Lafayette. Unofficial student tool.",
   "minimum_chrome_version": "116",
-  "permissions": ["storage", "offscreen", "activeTab", "contextMenus"],
-  "host_permissions": ["https://selfservice.mypurdue.purdue.edu/*"],
-  "background": { "service_worker": "background.js" },
-  "action": { "default_popup": "popup.html", "default_title": "PurdueTransferCheck" },
+  "permissions": [
+    "storage",
+    "offscreen",
+    "activeTab",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://selfservice.mypurdue.purdue.edu/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Pete — Purdue e-Transfer"
+  },
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content-script.js"],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content-script.js"
+      ],
       "run_at": "document_idle"
     }
   ],
-  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+  "icons": {
+    "16": "icons/16.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  }
 }
