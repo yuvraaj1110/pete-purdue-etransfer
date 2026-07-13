@@ -123,6 +123,22 @@ function showMsg(text: string, x: number, y: number): void {
 }
 
 async function runCheck(text: string, x: number, y: number): Promise<void> {
+  try {
+    await runCheckInner(text, x, y);
+  } catch (e) {
+    // After the user reloads the extension, content scripts in already-open
+    // tabs are orphaned: DOM still works, chrome.runtime is dead. Say so
+    // instead of silently ignoring the click.
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/Extension context invalidated|Receiving end does not exist/i.test(msg)) {
+      showMsg("PurdueTransferCheck was updated — refresh this page to reconnect.", x, y);
+    } else {
+      showMsg(`Lookup failed: ${msg}`, x, y);
+    }
+  }
+}
+
+async function runCheckInner(text: string, x: number, y: number): Promise<void> {
   const parsed = await sendBg({ kind: "PARSE_SELECTION", text });
   if (!("courses" in parsed) || !parsed.ok || parsed.courses.length === 0) {
     showMsg("Couldn't find a course like “CSCI 240” in the selection.", x, y);
