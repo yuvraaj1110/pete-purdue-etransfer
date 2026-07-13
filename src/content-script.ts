@@ -131,7 +131,7 @@ async function runCheck(text: string, x: number, y: number): Promise<void> {
     // instead of silently ignoring the click.
     const msg = e instanceof Error ? e.message : String(e);
     if (/Extension context invalidated|Receiving end does not exist/i.test(msg)) {
-      showMsg("PurdueTransferCheck was updated — refresh this page to reconnect.", x, y);
+      showMsg("Pete was updated — refresh this page to reconnect.", x, y);
     } else {
       showMsg(`Lookup failed: ${msg}`, x, y);
     }

@@ -1,11 +1,12 @@
-# PurdueTransferCheck
+# Pete — Purdue e-Transfer 🚂
 
-Chrome (MV3) extension: highlight a course on any college site — e.g. `CSCI 240 – Data Structures`
-on Ivy Tech's catalog — and instantly see whether it transfers to **Purdue West Lafayette**, as
-which Purdue course, and what kind of credit. Batch mode: highlight a whole schedule, get a graded
+**Pete** (after Purdue's mascot) is a Chrome (MV3) extension: highlight a course on any college
+site — e.g. `CSCI 240 – Data Structures` on Ivy Tech's catalog — and instantly see whether it
+transfers to **Purdue West Lafayette**, as which Purdue course, and what kind of credit. Batch mode: highlight a whole schedule, get a graded
 transfer report card in **one** request.
 
-> **Unofficial.** Always confirm with your advisor / the Purdue Registrar.
+> **Unofficial.** Not affiliated with Purdue University. Always confirm with your advisor /
+> the Purdue Registrar. Privacy: [PRIVACY.md](PRIVACY.md) — no data collected, ever.
 
 ## How it works
 

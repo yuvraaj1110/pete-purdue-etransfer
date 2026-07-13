@@ -1,7 +1,8 @@
 # Chrome Web Store listing (draft)
 
-**Name:** PurdueTransferCheck
+**Name:** Pete — Purdue e-Transfer (Unofficial)
 **Category:** Education · **Language:** English
+**Privacy policy URL:** point to PRIVACY.md on the public GitHub repo
 
 ## Summary (132 chars max)
 Highlight a course on any college site and instantly see if — and how — it transfers to Purdue West Lafayette. Unofficial.
