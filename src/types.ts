@@ -10,10 +10,11 @@ export interface CourseRef {
 
 export interface Equivalency {
   subject: string;
-  number: string; // "11510" | "1XTRA"
+  number: string; // "11510" | "1XTRA" | "NC"
   title: string;
   credits: number | null;
-  kind: "DIRECT" | "ELECTIVE" | "UNKNOWN";
+  // 5-digit ⇒ DIRECT; \dX[A-Z]{3} (2XUND, 1XXXX…) ⇒ ELECTIVE; "NC" ⇒ NOCREDIT
+  kind: "DIRECT" | "ELECTIVE" | "NOCREDIT" | "UNKNOWN";
 }
 
 export interface TransferResult {

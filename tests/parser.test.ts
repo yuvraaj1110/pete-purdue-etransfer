@@ -95,6 +95,9 @@ describe("classifyPurdueCourse", () => {
     ["1XSCI", "ELECTIVE"],
     ["1XUWC", "ELECTIVE"],
     ["1XTRA", "ELECTIVE"],
+    ["1XXXX", "ELECTIVE"],
+    ["3XXXX", "ELECTIVE"],
+    ["NC", "NOCREDIT"],
     ["WEIRD", "UNKNOWN"],
     ["165", "UNKNOWN"],
     ["", "UNKNOWN"],
@@ -104,7 +107,7 @@ describe("classifyPurdueCourse", () => {
 });
 
 describe("deriveVerdict", () => {
-  const eq = (kind: "DIRECT" | "ELECTIVE" | "UNKNOWN") => ({
+  const eq = (kind: "DIRECT" | "ELECTIVE" | "NOCREDIT" | "UNKNOWN") => ({
     subject: "X", number: "0", title: "", credits: null, kind,
   });
   it("empty -> NONE", () => expect(deriveVerdict([])).toBe("NONE"));
@@ -112,6 +115,10 @@ describe("deriveVerdict", () => {
     expect(deriveVerdict([eq("DIRECT"), eq("UNKNOWN")])).toBe("UNKNOWN"));
   it("direct+elective -> PARTIAL", () =>
     expect(deriveVerdict([eq("DIRECT"), eq("ELECTIVE")])).toBe("PARTIAL"));
+  it("explicit NC row -> NONE (OSU 'MA NC' case, seen live)", () =>
+    expect(deriveVerdict([eq("NOCREDIT")])).toBe("NONE"));
+  it("NC alongside real credit doesn't drag the verdict down", () =>
+    expect(deriveVerdict([eq("DIRECT"), eq("NOCREDIT")])).toBe("DIRECT"));
 });
 
 describe("parseAjaxList", () => {

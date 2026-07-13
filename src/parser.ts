@@ -40,6 +40,7 @@ function parseCredits(s: string): number | null {
 export function classifyPurdueCourse(number: string): Equivalency["kind"] {
   if (DIRECT_RE.test(number)) return "DIRECT";
   if (ELECTIVE_RE.test(number)) return "ELECTIVE";
+  if (number === "NC") return "NOCREDIT"; // seen live: OSU "Precollege Math" -> MA NC
   return "UNKNOWN";
 }
 
@@ -114,8 +115,10 @@ export function parseReportHtml(html: string): ParseOutcome {
 export function deriveVerdict(equivalencies: Equivalency[]): Verdict {
   if (equivalencies.length === 0) return "NONE";
   if (equivalencies.some((e) => e.kind === "UNKNOWN")) return "UNKNOWN";
-  const direct = equivalencies.some((e) => e.kind === "DIRECT");
-  const elective = equivalencies.some((e) => e.kind === "ELECTIVE");
+  const credited = equivalencies.filter((e) => e.kind !== "NOCREDIT");
+  if (credited.length === 0) return "NONE"; // an explicit "NC" row = no credit granted
+  const direct = credited.some((e) => e.kind === "DIRECT");
+  const elective = credited.some((e) => e.kind === "ELECTIVE");
   if (direct && elective) return "PARTIAL";
   return direct ? "DIRECT" : "ELECTIVE";
 }
