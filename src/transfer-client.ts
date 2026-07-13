@@ -61,7 +61,9 @@ async function fetchWithRetry(
   const attempt = () => fetchFn(url, init);
   try {
     const res = await attempt();
-    if (res.status >= 500) throw new Error(`HTTP ${res.status}`);
+    // Fail loudly on ANY non-OK (403/404/5xx) — an error body must never
+    // reach the parser and masquerade as a page-layout problem.
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res;
   } catch {
     await sleep(500 + Math.random() * 500); // single retry, jittered
@@ -73,6 +75,13 @@ async function fetchWithRetry(
 
 const defaultSleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
+/**
+ * GET, not POST: Oracle ORDS rejects cross-origin POSTs with 403 ORDS-13002
+ * ("failed cross origin request validation") because Chrome attaches
+ * `Origin: chrome-extension://…` to every cross-origin POST. GETs carry no
+ * Origin header, and mod_plsql treats GET and POST params identically —
+ * verified live (docs/purdue-endpoint.md §6.15).
+ */
 export async function fetchReportHtml(
   req: LookupRequest,
   fetchFn: FetchLike = fetch,
@@ -80,12 +89,8 @@ export async function fetchReportHtml(
 ): Promise<string> {
   const res = await fetchWithRetry(
     fetchFn,
-    `${BASE}bzwtxcrd.p_display_report`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: buildReportBody(req),
-    },
+    `${BASE}bzwtxcrd.p_display_report?${buildReportBody(req)}`,
+    undefined,
     sleep,
   );
   return res.text();

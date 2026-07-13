@@ -22,3 +22,17 @@
 
 6. **Cascade presence ≠ articulation.** ENGL 111H lists in the course dropdown but returns no
    report row. The "in the list so it transfers" shortcut is wrong; only absence is meaningful.
+
+7. **ORDS-13002: the POST that only fails inside the extension.** All curl testing passed;
+   the shipped extension got `403 Forbidden — "failed cross origin request validation"` on the
+   report POST. Chrome silently attaches `Origin: chrome-extension://…` to cross-origin POSTs
+   and Oracle ORDS rejects foreign origins. curl never sends Origin, so the spike couldn't see
+   it. Fix: switched the report call to GET (identical params, byte-identical response, no
+   Origin header). Lesson: an HTTP client is not a browser — the *headers your runtime adds*
+   are part of the request contract.
+
+8. **Closed shadow roots are write-only.** `element.shadowRoot` is `null` for
+   `attachShadow({mode:"closed"})`, so re-reading it on the second render returned null and the
+   highlight chip's click handler crashed before drawing anything. Fix: keep the ShadowRoot in
+   a module variable. Symptom looked like "button ignores clicks" — it was actually a TypeError
+   on the re-render path.

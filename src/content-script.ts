@@ -7,13 +7,17 @@ import type { TransferReport } from "./types";
  */
 
 let shadowHost: HTMLDivElement | null = null;
+// Kept in a module var: element.shadowRoot is ALWAYS null for closed roots,
+// so it cannot be re-read from the host (this broke every second UI render).
+let shadowRootRef: ShadowRoot | null = null;
 
 function ensureShadow(): ShadowRoot {
-  if (shadowHost?.isConnected) return shadowHost.shadowRoot!;
+  if (shadowHost?.isConnected && shadowRootRef) return shadowRootRef;
   shadowHost = document.createElement("div");
   shadowHost.id = "purdue-transfer-check-root";
   shadowHost.style.cssText = "all: initial; position: fixed; z-index: 2147483647;";
   const shadow = shadowHost.attachShadow({ mode: "closed" });
+  shadowRootRef = shadow;
   const style = document.createElement("style");
   style.textContent = `
     .chip { position: fixed; background: #cfb991; color: #000; border: 1px solid #9d8a5e;
@@ -36,8 +40,8 @@ function ensureShadow(): ShadowRoot {
 }
 
 function clearUi(): void {
-  shadowHost?.shadowRoot &&
-    [...shadowHost.shadowRoot.querySelectorAll(".chip, .card")].forEach((n) => n.remove());
+  shadowRootRef &&
+    [...shadowRootRef.querySelectorAll(".chip, .card")].forEach((n) => n.remove());
 }
 
 function showChip(x: number, y: number, text: string): void {

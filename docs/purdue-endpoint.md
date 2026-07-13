@@ -116,3 +116,9 @@ Breaking points discovered by probing — each is a parser/design requirement:
 12. **MV3 has no `DOMParser` in service workers.** Parse in an offscreen document (`chrome.offscreen`) or in the popup/content-script context.
 13. `p_ajax` echoes `load_into` back into the response — sanitize before any DOM insertion.
 14. BigIP fronted — transient 5xx/affinity flakiness possible; retry once with backoff.
+15. **ORDS blocks cross-origin POSTs (found in-extension 2026-07-13).** Chrome attaches
+    `Origin: chrome-extension://…` to every cross-origin POST; ORDS answers
+    `403 ORDS-13002 "failed cross origin request validation"`. curl worked only because it sends
+    no Origin. **Fix: use GET** — `p_display_report?location_in=…` with the identical repeated
+    params returns byte-identical results (mod_plsql treats GET/POST alike), and GETs carry no
+    Origin header. All report fetches are GET now. The `p_ajax` GETs were never affected.

@@ -78,8 +78,17 @@ describe("buildAjaxUrl", () => {
   });
 });
 
-describe("fetchReportHtml retry", () => {
+describe("fetchReportHtml", () => {
   const ok = (body: string) => new Response(body, { status: 200 });
+
+  it("uses GET with query params — extension POSTs get 403 ORDS-13002 (cross-origin validation)", async () => {
+    const fetchFn = vi.fn().mockResolvedValue(ok("<html>fine</html>"));
+    await fetchReportHtml(req([{ subject: "MATH", number: "211" }]), fetchFn, async () => {});
+    const [url, init] = fetchFn.mock.calls[0]!;
+    expect(url).toContain("bzwtxcrd.p_display_report?location_in=US");
+    expect(url).toContain("subject_in=MATH");
+    expect(init).toBeUndefined(); // plain GET: no method, no body, no Origin header sent
+  });
 
   it("retries once on 5xx and succeeds", async () => {
     const fetchFn = vi
@@ -89,6 +98,13 @@ describe("fetchReportHtml retry", () => {
     const html = await fetchReportHtml(req([{ subject: "MATH", number: "211" }]), fetchFn, async () => {});
     expect(html).toBe("<html>fine</html>");
     expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
+  it("fails loudly on 403 — error bodies must never reach the parser", async () => {
+    const fetchFn = vi.fn().mockResolvedValue(new Response("{\"code\":\"Forbidden\"}", { status: 403 }));
+    await expect(
+      fetchReportHtml(req([{ subject: "MATH", number: "211" }]), fetchFn, async () => {}),
+    ).rejects.toThrow(/HTTP 403/);
   });
 
   it("throws after the second failure (single retry only)", async () => {
