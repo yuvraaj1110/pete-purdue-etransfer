@@ -207,11 +207,14 @@ interface TransferReport {      // batch = the core primitive; single lookup is 
 
 ## 8. Build order
 
-1. Spike + endpoint doc + fixtures ✅ (done — `purdue-endpoint.md`, `tests/fixtures/`).
-2. `parser.ts` against fixtures (multi-row grouping, verdict derivation) — TDD.
-3. `transfer-client.ts` (5-row array binding, ≥2-row guard, retry) against mocked fetch.
-4. Popup manual flow end-to-end (F2) → real result.
-5. Cache + throttle (F6), school registry (F4).
-6. Content script + Shadow-DOM card (F1), then batch (F3).
-7. Harden trust surface (F5, F7), package, listing.
+1. Spike + endpoint doc + fixtures ✅ (`purdue-endpoint.md`, `tests/fixtures/`).
+2. `parser.ts` against fixtures ✅ (31 tests; multi-row grouping, verdict derivation, loud-UNKNOWN).
+3. `transfer-client.ts` ✅ (5-row array binding, uppercase guard, retry, throttle; mocked-fetch tests).
+4. Popup manual flow end-to-end (F2) ✅ — plus batch textarea.
+5. Cache + throttle (F6) ✅, school registry (F4) ✅ (live p_ajax list + domain map).
+6. Content script + Shadow-DOM card (F1) ✅, batch (F3) ✅, context menu (F14) ✅.
+7. Trust surface (F5, F7) ✅; packaged zip ✅; store listing drafted (`docs/store-listing.md`).
+   **Verified live 2026-07-13:** MATH 211→DIRECT, CHEM 105→PARTIAL(3 rows), CSCI 201→ELECTIVE
+   via `scripts/live-smoke.mjs`. Remaining before submission: real icons, screenshots,
+   manual in-Chrome QA on 5 college sites.
 8. Stretch features as time allows, each behind the green core.
