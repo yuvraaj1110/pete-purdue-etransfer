@@ -16,25 +16,32 @@ export interface IndexedSchool {
 export const SCHOOL_INDEX: IndexedSchool[] = rawIndex as IndexedSchool[];
 
 /**
- * Rank-aware global search: all query tokens must appear in the school name
- * (or state code). "north dakota univ" finds Univ of North Dakota regardless
- * of the currently selected state.
+ * Rank-aware global search: every query token must match a word of the school
+ * name. Matching is prefix-tolerant BOTH ways because Purdue's directory
+ * abbreviates aggressively ("Univ Of North Dakota", "Coll of DuPage"):
+ *   query "university" matches name word "univ"; query "tech" matches
+ *   "technology". Short words (<4 chars) must match exactly ("of", "st").
  */
+function tokenMatchesWord(t: string, w: string): boolean {
+  if (w.startsWith(t)) return true; // "tech" -> "technology"
+  return t.length >= 4 && w.length >= 4 && t.startsWith(w); // "university" -> "univ"
+}
+
 export function searchSchoolIndex(query: string, limit = 50): IndexedSchool[] {
   const tokens = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
   if (tokens.length === 0) return [];
   const scored: { e: IndexedSchool; score: number }[] = [];
   for (const e of SCHOOL_INDEX) {
-    const hay = e.n.toLowerCase();
+    const words = e.n.toLowerCase().split(/[\s\-/]+/).filter(Boolean);
     let score = 0;
     let ok = true;
     for (const t of tokens) {
-      const i = hay.indexOf(t);
-      if (i === -1) {
+      const wi = words.findIndex((w) => tokenMatchesWord(t, w));
+      if (wi === -1) {
         ok = false;
         break;
       }
-      score += i === 0 || hay[i - 1] === " " || hay[i - 1] === "-" ? 2 : 1; // word-start bonus
+      score += (words[wi] === t ? 2 : 1) + (wi === 0 ? 1 : 0); // exact + leading-word bonus
     }
     if (ok) scored.push({ e, score });
   }

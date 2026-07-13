@@ -12,6 +12,11 @@ describe("domainToSchool", () => {
     expect(domainToSchool("purdue.edu")).toBeNull();
     expect(domainToSchool("example.com")).toBeNull();
   });
+  it("maps the verified out-of-state schools", () => {
+    expect(domainToSchool("und.edu")?.code).toBe("006878");
+    expect(domainToSchool("catalog.umich.edu")?.code).toBe("001839");
+    expect(domainToSchool("www.gatech.edu")?.code).toBe("005248");
+  });
 });
 
 describe("searchSchools", () => {

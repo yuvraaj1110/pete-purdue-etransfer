@@ -22,6 +22,19 @@ describe("searchSchoolIndex", () => {
     expect(hits.some((e) => e.s === "ND" && /North Dakota/i.test(e.n))).toBe(true);
   });
 
+  it("full word 'university' matches abbreviated 'Univ' (UND bug #2)", () => {
+    const hits = searchSchoolIndex("university of north dakota");
+    expect(hits.some((e) => e.c === "006878")).toBe(true);
+  });
+
+  it("query prefixes match longer name words ('tech' -> 'Technology')", () => {
+    expect(searchSchoolIndex("georgia tech").some((e) => e.c === "005248")).toBe(true);
+  });
+
+  it("'college of dupage' matches 'Coll of DuPage'", () => {
+    expect(searchSchoolIndex("college of dupage").some((e) => e.c === "001083")).toBe(true);
+  });
+
   it("all tokens must match", () => {
     const hits = searchSchoolIndex("ivy tech");
     expect(hits.length).toBeGreaterThan(0);

@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Pete \u2014 Purdue e-Transfer (Unofficial)",
   "short_name": "Pete",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Highlight a course on any college site and instantly see if it transfers to Purdue West Lafayette. Unofficial student tool.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -19,7 +19,7 @@
   },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Pete — Purdue e-Transfer"
+    "default_title": "Pete \u2014 Purdue e-Transfer"
   },
   "content_scripts": [
     {

@@ -19,6 +19,14 @@ const DOMAIN_MAP: Record<string, SchoolEntry> = {
   "usi.edu": { code: "001335", name: "Univ of Southern Indiana", location: "US", state: "IN" },
   "uindy.edu": { code: "001321", name: "Univ of Indianapolis-IN", location: "US", state: "IN" },
   "nd.edu": { code: "001841", name: "Univ of Notre Dame-IN", location: "US", state: "IN" },
+  "vinu.edu": { code: "001877", name: "Vincennes University-IN", location: "US", state: "IN" },
+  "und.edu": { code: "006878", name: "Univ Of North Dakota", location: "US", state: "ND" },
+  "ndsu.edu": { code: "006474", name: "North Dakota State Univ", location: "US", state: "ND" },
+  "umich.edu": { code: "001839", name: "Univ of Michigan Ann Arbor", location: "US", state: "MI" },
+  "msu.edu": { code: "001465", name: "Michigan State Univ", location: "US", state: "MI" },
+  "osu.edu": { code: "001592", name: "Ohio State University", location: "US", state: "OH" },
+  "cod.edu": { code: "001083", name: "Coll of DuPage Glen Ellyn-IL", location: "US", state: "IL" },
+  "gatech.edu": { code: "005248", name: "Georgia Inst of Technology", location: "US", state: "GA" },
 };
 
 /** Match a hostname (or any subdomain of it) to a known school. */
