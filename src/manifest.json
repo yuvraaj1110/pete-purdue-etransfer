@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "PurdueTransferCheck",
+  "version": "0.1.0",
+  "description": "Highlight a course on any college site and instantly see if it transfers to Purdue West Lafayette. Unofficial.",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "offscreen", "activeTab", "contextMenus"],
+  "host_permissions": ["https://selfservice.mypurdue.purdue.edu/*"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_popup": "popup.html", "default_title": "PurdueTransferCheck" },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": { "16": "icons/16.png", "48": "icons/48.png", "128": "icons/128.png" }
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 13px/1.45 system-ui, sans-serif; width: 360px; margin: 0; padding: 12px; }
+  h1 { font-size: 15px; margin: 0 0 2px; }
+  .sub { color: #777; font-size: 11px; margin-bottom: 10px; }
+  label { display: block; font-weight: 600; margin: 8px 0 2px; }
+  select, input, textarea, button { width: 100%; box-sizing: border-box; padding: 6px; font: inherit; }
+  .row { display: flex; gap: 8px; }
+  .row > div { flex: 1; }
+  button.primary { margin-top: 10px; background: #cfb991; border: 1px solid #9d8a5e; border-radius: 4px; cursor: pointer; font-weight: 700; }
+  button.primary:disabled { opacity: .5; cursor: default; }
+  #results { margin-top: 12px; }
+  .card { border: 1px solid #ccc4; border-left-width: 4px; border-radius: 4px; padding: 8px; margin-bottom: 8px; }
+  .card.DIRECT { border-left-color: #2e7d32; }
+  .card.PARTIAL { border-left-color: #f9a825; }
+  .card.ELECTIVE { border-left-color: #f9a825; }
+  .card.NONE { border-left-color: #c62828; }
+  .card.UNKNOWN { border-left-color: #757575; }
+  .v { font-weight: 700; }
+  .eq { margin: 4px 0 0 0; padding-left: 16px; }
+  .caveats { color: #888; font-size: 11px; margin-top: 6px; }
+  .summary { font-weight: 600; margin-bottom: 8px; }
+  .disclaimer { margin-top: 10px; font-size: 11px; color: #a15c00; }
+  .err { color: #c62828; }
+</style>
+</head>
+<body>
+  <h1>PurdueTransferCheck</h1>
+  <div class="sub">Does your course transfer to Purdue West Lafayette?</div>
+
+  <label for="school">School</label>
+  <input id="schoolSearch" placeholder="Search school (e.g. Ivy Tech)…" autocomplete="off" />
+  <select id="school" size="1"></select>
+  <div class="row">
+    <div>
+      <label for="location">Location</label>
+      <select id="location"><option value="US" selected>US</option><option value="Outside US">Outside US</option></select>
+    </div>
+    <div>
+      <label for="state">State/Country</label>
+      <select id="state"><option value="IN" selected>Indiana</option></select>
+    </div>
+  </div>
+
+  <label for="courses">Course(s) — one per line or comma-separated</label>
+  <textarea id="courses" rows="3" placeholder="MATH 211&#10;CSCI 201&#10;CHEM 105"></textarea>
+
+  <button id="check" class="primary">Check transfer credit</button>
+
+  <div id="results"></div>
+  <div class="disclaimer">Unofficial — confirm with your advisor / Purdue Registrar.
+    <a href="https://selfservice.mypurdue.purdue.edu/prod/bzwtxcrd.p_select_info" target="_blank">Official lookup ↗</a>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
