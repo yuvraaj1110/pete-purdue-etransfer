@@ -117,7 +117,9 @@ function showMsg(text: string, x: number, y: number): void {
   card.style.top = `${y + 8}px`;
   card.textContent = text;
   shadow.append(card);
-  setTimeout(clearUi, 4000);
+  // Auto-fade THIS message only. A blanket clearUi() here was a stale-timer
+  // bug: it fired ~4s later and wiped the result card that had replaced it.
+  setTimeout(() => card.remove(), 4000);
 }
 
 async function runCheck(text: string, x: number, y: number): Promise<void> {
