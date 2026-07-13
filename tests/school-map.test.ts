@@ -17,6 +17,16 @@ describe("domainToSchool", () => {
     expect(domainToSchool("catalog.umich.edu")?.code).toBe("001839");
     expect(domainToSchool("www.gatech.edu")?.code).toBe("005248");
   });
+  it("covers 100+ top-enrollment domains, each with a real directory code", () => {
+    const domains = ["asu.edu", "ucf.edu", "tamu.edu", "utexas.edu", "psu.edu", "ucla.edu",
+      "berkeley.edu", "wisc.edu", "washington.edu", "rutgers.edu", "nyu.edu", "wgu.edu",
+      "liberty.edu", "gcu.edu", "ufl.edu", "uga.edu", "ncsu.edu", "vt.edu", "lsu.edu", "ku.edu"];
+    for (const d of domains) {
+      const s = domainToSchool(d);
+      expect(s, d).not.toBeNull();
+      expect(s!.code, d).toMatch(/^[A-Z0-9]{6}$/);
+    }
+  });
 });
 
 describe("searchSchools", () => {

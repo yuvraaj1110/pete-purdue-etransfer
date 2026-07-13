@@ -1,0 +1,782 @@
+{
+ "ivytech.edu": {
+  "code": "003825",
+  "name": "Ivy Tech Community College-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "iu.edu": {
+  "code": "001324",
+  "name": "Indiana University Bloomington",
+  "location": "US",
+  "state": "IN"
+ },
+ "iupui.edu": {
+  "code": "001325",
+  "name": "Indiana University Indianapolis",
+  "location": "US",
+  "state": "IN"
+ },
+ "indstate.edu": {
+  "code": "001322",
+  "name": "Indiana State Univ Terre Haute",
+  "location": "US",
+  "state": "IN"
+ },
+ "bsu.edu": {
+  "code": "001051",
+  "name": "Ball State Univ Muncie-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "butler.edu": {
+  "code": "001073",
+  "name": "Butler Univ Indianapolis-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "usi.edu": {
+  "code": "001335",
+  "name": "Univ of Southern Indiana",
+  "location": "US",
+  "state": "IN"
+ },
+ "uindy.edu": {
+  "code": "001321",
+  "name": "Univ of Indianapolis-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "nd.edu": {
+  "code": "001841",
+  "name": "Univ of Notre Dame-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "vinu.edu": {
+  "code": "001877",
+  "name": "Vincennes University-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "wgu.edu": {
+  "code": "003949",
+  "name": "Western Governors Univ-IN",
+  "location": "US",
+  "state": "IN"
+ },
+ "phoenix.edu": {
+  "code": "001024",
+  "name": "University of Phoenix-AZ",
+  "location": "US",
+  "state": "AZ"
+ },
+ "gcu.edu": {
+  "code": "004331",
+  "name": "Grand Canyon University-AZ",
+  "location": "US",
+  "state": "AZ"
+ },
+ "liberty.edu": {
+  "code": "005385",
+  "name": "Liberty University-VA",
+  "location": "US",
+  "state": "VA"
+ },
+ "umgc.edu": {
+  "code": "000551",
+  "name": "Univ of Maryland Global Campus",
+  "location": "US",
+  "state": "MD"
+ },
+ "devry.edu": {
+  "code": "001171",
+  "name": "DeVry University-IL",
+  "location": "US",
+  "state": "IL"
+ },
+ "asu.edu": {
+  "code": "004007",
+  "name": "Arizona State University-Tempe",
+  "location": "US",
+  "state": "AZ"
+ },
+ "arizona.edu": {
+  "code": "004832",
+  "name": "University of Arizona",
+  "location": "US",
+  "state": "AZ"
+ },
+ "nau.edu": {
+  "code": "004006",
+  "name": "Northern Arizona University",
+  "location": "US",
+  "state": "AZ"
+ },
+ "unlv.edu": {
+  "code": "004861",
+  "name": "Univ of Nevada/Las Vegas",
+  "location": "US",
+  "state": "NV"
+ },
+ "byu.edu": {
+  "code": "004019",
+  "name": "Brigham Young University-UT",
+  "location": "US",
+  "state": "UT"
+ },
+ "utah.edu": {
+  "code": "004853",
+  "name": "Univ of Utah",
+  "location": "US",
+  "state": "UT"
+ },
+ "usu.edu": {
+  "code": "004857",
+  "name": "Utah State University",
+  "location": "US",
+  "state": "UT"
+ },
+ "uoregon.edu": {
+  "code": "004846",
+  "name": "Univ of Oregon",
+  "location": "US",
+  "state": "OR"
+ },
+ "oregonstate.edu": {
+  "code": "004586",
+  "name": "Oregon State University",
+  "location": "US",
+  "state": "OR"
+ },
+ "colorado.edu": {
+  "code": "004841",
+  "name": "Univ of Colorado/Boulder",
+  "location": "US",
+  "state": "CO"
+ },
+ "colostate.edu": {
+  "code": "004075",
+  "name": "Colorado State University",
+  "location": "US",
+  "state": "CO"
+ },
+ "unm.edu": {
+  "code": "004845",
+  "name": "Univ of New Mexico/Albuquerque",
+  "location": "US",
+  "state": "NM"
+ },
+ "boisestate.edu": {
+  "code": "004018",
+  "name": "Boise State University-ID",
+  "location": "US",
+  "state": "ID"
+ },
+ "hawaii.edu": {
+  "code": "004867",
+  "name": "Univ of Hawaii/Manoa",
+  "location": "US",
+  "state": "HI"
+ },
+ "washington.edu": {
+  "code": "004854",
+  "name": "Univ of Washington",
+  "location": "US",
+  "state": "WA"
+ },
+ "wsu.edu": {
+  "code": "004705",
+  "name": "Washington State University",
+  "location": "US",
+  "state": "WA"
+ },
+ "ucla.edu": {
+  "code": "004837",
+  "name": "Univ of California/Los Angeles",
+  "location": "US",
+  "state": "CA"
+ },
+ "berkeley.edu": {
+  "code": "004833",
+  "name": "Univ of California/Berkeley",
+  "location": "US",
+  "state": "CA"
+ },
+ "ucdavis.edu": {
+  "code": "004834",
+  "name": "University of California Davis",
+  "location": "US",
+  "state": "CA"
+ },
+ "ucsd.edu": {
+  "code": "004836",
+  "name": "Univ of California/San Diego",
+  "location": "US",
+  "state": "CA"
+ },
+ "uci.edu": {
+  "code": "004859",
+  "name": "Univ of California/Irvine",
+  "location": "US",
+  "state": "CA"
+ },
+ "ucr.edu": {
+  "code": "004839",
+  "name": "Univ of California/Riverside",
+  "location": "US",
+  "state": "CA"
+ },
+ "usc.edu": {
+  "code": "004852",
+  "name": "Univ of Southern California",
+  "location": "US",
+  "state": "CA"
+ },
+ "sdsu.edu": {
+  "code": "004682",
+  "name": "San Diego State University-CA",
+  "location": "US",
+  "state": "CA"
+ },
+ "csulb.edu": {
+  "code": "004389",
+  "name": "Calif State Univ/Long Beach",
+  "location": "US",
+  "state": "CA"
+ },
+ "csun.edu": {
+  "code": "004707",
+  "name": "Calif State Univ/Northridge",
+  "location": "US",
+  "state": "CA"
+ },
+ "fullerton.edu": {
+  "code": "004589",
+  "name": "Calif State Univ/Fullerton",
+  "location": "US",
+  "state": "CA"
+ },
+ "sjsu.edu": {
+  "code": "004687",
+  "name": "San Jose State University-CA",
+  "location": "US",
+  "state": "CA"
+ },
+ "calpoly.edu": {
+  "code": "004038",
+  "name": "Calif Polytech State Univ/SLO",
+  "location": "US",
+  "state": "CA"
+ },
+ "cpp.edu": {
+  "code": "004082",
+  "name": "Calif State Poly Univ/Pomona",
+  "location": "US",
+  "state": "CA"
+ },
+ "tamu.edu": {
+  "code": "006003",
+  "name": "Texas A&M University/Coll Sta",
+  "location": "US",
+  "state": "TX"
+ },
+ "utexas.edu": {
+  "code": "006882",
+  "name": "Univ of Texas/Austin",
+  "location": "US",
+  "state": "TX"
+ },
+ "uh.edu": {
+  "code": "006870",
+  "name": "Univ of Houston/Univ Pk-TX",
+  "location": "US",
+  "state": "TX"
+ },
+ "txst.edu": {
+  "code": "006667",
+  "name": "Texas State Univ San Marcos",
+  "location": "US",
+  "state": "TX"
+ },
+ "utsa.edu": {
+  "code": "006919",
+  "name": "Univ of Texas/San Antonio",
+  "location": "US",
+  "state": "TX"
+ },
+ "uta.edu": {
+  "code": "006013",
+  "name": "Univ of Texas/Arlington",
+  "location": "US",
+  "state": "TX"
+ },
+ "unt.edu": {
+  "code": "006481",
+  "name": "Univ of North Texas",
+  "location": "US",
+  "state": "TX"
+ },
+ "ttu.edu": {
+  "code": "006827",
+  "name": "Texas Tech University",
+  "location": "US",
+  "state": "TX"
+ },
+ "utep.edu": {
+  "code": "006829",
+  "name": "Univ of Texas/El Paso",
+  "location": "US",
+  "state": "TX"
+ },
+ "osu.edu": {
+  "code": "001592",
+  "name": "Ohio State University",
+  "location": "US",
+  "state": "OH"
+ },
+ "kent.edu": {
+  "code": "001367",
+  "name": "Kent State Univ Kent-OH",
+  "location": "US",
+  "state": "OH"
+ },
+ "ohio.edu": {
+  "code": "001593",
+  "name": "Ohio University Athens-OH",
+  "location": "US",
+  "state": "OH"
+ },
+ "uc.edu": {
+  "code": "001833",
+  "name": "Univ of Cincinnati-OH",
+  "location": "US",
+  "state": "OH"
+ },
+ "bgsu.edu": {
+  "code": "001069",
+  "name": "Bowling Green State Univ-OH",
+  "location": "US",
+  "state": "OH"
+ },
+ "uakron.edu": {
+  "code": "001829",
+  "name": "Univ of Akron-OH",
+  "location": "US",
+  "state": "OH"
+ },
+ "miamioh.edu": {
+  "code": "001463",
+  "name": "Miami University-OH",
+  "location": "US",
+  "state": "OH"
+ },
+ "umich.edu": {
+  "code": "001839",
+  "name": "Univ of Michigan Ann Arbor",
+  "location": "US",
+  "state": "MI"
+ },
+ "msu.edu": {
+  "code": "001465",
+  "name": "Michigan State Univ",
+  "location": "US",
+  "state": "MI"
+ },
+ "wayne.edu": {
+  "code": "001898",
+  "name": "Wayne State Uni Detroit-MI",
+  "location": "US",
+  "state": "MI"
+ },
+ "wmich.edu": {
+  "code": "001902",
+  "name": "Western Michigan Univ/Kalamzoo",
+  "location": "US",
+  "state": "MI"
+ },
+ "cmich.edu": {
+  "code": "001106",
+  "name": "Central Michigan University",
+  "location": "US",
+  "state": "MI"
+ },
+ "gvsu.edu": {
+  "code": "001258",
+  "name": "Grand Valley State Univ-MI",
+  "location": "US",
+  "state": "MI"
+ },
+ "illinois.edu": {
+  "code": "001836",
+  "name": "Univ of Illinois at Urb/Chmpn",
+  "location": "US",
+  "state": "IL"
+ },
+ "uic.edu": {
+  "code": "001851",
+  "name": "Univ of Illinois at Chicago",
+  "location": "US",
+  "state": "IL"
+ },
+ "niu.edu": {
+  "code": "001559",
+  "name": "Northern Illinois University",
+  "location": "US",
+  "state": "IL"
+ },
+ "cod.edu": {
+  "code": "001083",
+  "name": "Coll of DuPage Glen Ellyn-IL",
+  "location": "US",
+  "state": "IL"
+ },
+ "wisc.edu": {
+  "code": "001846",
+  "name": "Univ of Wisconsin Madison",
+  "location": "US",
+  "state": "WI"
+ },
+ "iastate.edu": {
+  "code": "006306",
+  "name": "Iowa State University",
+  "location": "US",
+  "state": "IA"
+ },
+ "uiowa.edu": {
+  "code": "006681",
+  "name": "Univ of Iowa",
+  "location": "US",
+  "state": "IA"
+ },
+ "unl.edu": {
+  "code": "006877",
+  "name": "Univ of Nebraska/Lincoln",
+  "location": "US",
+  "state": "NE"
+ },
+ "mizzou.edu": {
+  "code": "006875",
+  "name": "Univ of Missouri/Columbia",
+  "location": "US",
+  "state": "MO"
+ },
+ "ku.edu": {
+  "code": "006871",
+  "name": "Univ of Kansas",
+  "location": "US",
+  "state": "KS"
+ },
+ "k-state.edu": {
+  "code": "006334",
+  "name": "Kansas State University",
+  "location": "US",
+  "state": "KS"
+ },
+ "und.edu": {
+  "code": "006878",
+  "name": "Univ Of North Dakota",
+  "location": "US",
+  "state": "ND"
+ },
+ "ndsu.edu": {
+  "code": "006474",
+  "name": "North Dakota State Univ",
+  "location": "US",
+  "state": "ND"
+ },
+ "ufl.edu": {
+  "code": "005812",
+  "name": "Univ of Florida",
+  "location": "US",
+  "state": "FL"
+ },
+ "ucf.edu": {
+  "code": "005233",
+  "name": "Univ of Central Florida",
+  "location": "US",
+  "state": "FL"
+ },
+ "fiu.edu": {
+  "code": "005206",
+  "name": "Florida Intl Univ/Miami",
+  "location": "US",
+  "state": "FL"
+ },
+ "usf.edu": {
+  "code": "005828",
+  "name": "Univ of South Florida",
+  "location": "US",
+  "state": "FL"
+ },
+ "fsu.edu": {
+  "code": "005219",
+  "name": "Florida State University",
+  "location": "US",
+  "state": "FL"
+ },
+ "fau.edu": {
+  "code": "005229",
+  "name": "Florida Atlantic Univ/Boca Rtn",
+  "location": "US",
+  "state": "FL"
+ },
+ "uga.edu": {
+  "code": "005813",
+  "name": "University of Georgia",
+  "location": "US",
+  "state": "GA"
+ },
+ "gsu.edu": {
+  "code": "005251",
+  "name": "Georgia State University",
+  "location": "US",
+  "state": "GA"
+ },
+ "gatech.edu": {
+  "code": "005248",
+  "name": "Georgia Inst of Technology",
+  "location": "US",
+  "state": "GA"
+ },
+ "kennesaw.edu": {
+  "code": "005359",
+  "name": "Kennesaw State University-GA",
+  "location": "US",
+  "state": "GA"
+ },
+ "ua.edu": {
+  "code": "001830",
+  "name": "University of Alabama",
+  "location": "US",
+  "state": "AL"
+ },
+ "auburn.edu": {
+  "code": "001005",
+  "name": "Auburn University-AL",
+  "location": "US",
+  "state": "AL"
+ },
+ "utk.edu": {
+  "code": "001843",
+  "name": "Univ of Tennessee Knoxville",
+  "location": "US",
+  "state": "TN"
+ },
+ "memphis.edu": {
+  "code": "001459",
+  "name": "Univ of Memphis-TN",
+  "location": "US",
+  "state": "TN"
+ },
+ "mtsu.edu": {
+  "code": "001466",
+  "name": "Middle Tennessee State Univ",
+  "location": "US",
+  "state": "TN"
+ },
+ "uky.edu": {
+  "code": "001837",
+  "name": "Univ of Kentucky Lexington",
+  "location": "US",
+  "state": "KY"
+ },
+ "louisville.edu": {
+  "code": "001838",
+  "name": "Univ of Louisville-KY",
+  "location": "US",
+  "state": "KY"
+ },
+ "wku.edu": {
+  "code": "001901",
+  "name": "Western Kentucky University",
+  "location": "US",
+  "state": "KY"
+ },
+ "olemiss.edu": {
+  "code": "001840",
+  "name": "Univ of Mississippi",
+  "location": "US",
+  "state": "MS"
+ },
+ "msstate.edu": {
+  "code": "001480",
+  "name": "Mississippi State University",
+  "location": "US",
+  "state": "MS"
+ },
+ "lsu.edu": {
+  "code": "006373",
+  "name": "Louisiana State Univ/A&M Coll",
+  "location": "US",
+  "state": "LA"
+ },
+ "uark.edu": {
+  "code": "006866",
+  "name": "Univ of Arkansas/Fayetteville",
+  "location": "US",
+  "state": "AR"
+ },
+ "ou.edu": {
+  "code": "006879",
+  "name": "Univ of Oklahoma",
+  "location": "US",
+  "state": "OK"
+ },
+ "okstate.edu": {
+  "code": "006546",
+  "name": "Oklahoma State University",
+  "location": "US",
+  "state": "OK"
+ },
+ "ncsu.edu": {
+  "code": "005496",
+  "name": "North Carolina State Univ",
+  "location": "US",
+  "state": "NC"
+ },
+ "ecu.edu": {
+  "code": "005180",
+  "name": "East Carolina University-NC",
+  "location": "US",
+  "state": "NC"
+ },
+ "clemson.edu": {
+  "code": "005111",
+  "name": "Clemson University-SC",
+  "location": "US",
+  "state": "SC"
+ },
+ "vt.edu": {
+  "code": "005859",
+  "name": "Virginia Poly Inst & State Uni",
+  "location": "US",
+  "state": "VA"
+ },
+ "gmu.edu": {
+  "code": "005827",
+  "name": "George Mason University-VA",
+  "location": "US",
+  "state": "VA"
+ },
+ "odu.edu": {
+  "code": "005126",
+  "name": "Old Dominion University-VA",
+  "location": "US",
+  "state": "VA"
+ },
+ "vcu.edu": {
+  "code": "005570",
+  "name": "Virginia Commonwealth Universi",
+  "location": "US",
+  "state": "VA"
+ },
+ "jmu.edu": {
+  "code": "005392",
+  "name": "James Madison University-VA",
+  "location": "US",
+  "state": "VA"
+ },
+ "wvu.edu": {
+  "code": "005904",
+  "name": "West Virginia Univ/Morgantown",
+  "location": "US",
+  "state": "WV"
+ },
+ "psu.edu": {
+  "code": "002660",
+  "name": "Pennsylvania State University",
+  "location": "US",
+  "state": "PA"
+ },
+ "temple.edu": {
+  "code": "002906",
+  "name": "Temple University-PA",
+  "location": "US",
+  "state": "PA"
+ },
+ "pitt.edu": {
+  "code": "002927",
+  "name": "University of Pittsburgh-PA",
+  "location": "US",
+  "state": "PA"
+ },
+ "drexel.edu": {
+  "code": "002194",
+  "name": "Drexel University-PA",
+  "location": "US",
+  "state": "PA"
+ },
+ "rutgers.edu": {
+  "code": "002765",
+  "name": "Rutgers University-NJ",
+  "location": "US",
+  "state": "NJ"
+ },
+ "umd.edu": {
+  "code": "005814",
+  "name": "Univ of Maryland/College Park",
+  "location": "US",
+  "state": "MD"
+ },
+ "stonybrook.edu": {
+  "code": "002548",
+  "name": "Stony Brook University-SUNY",
+  "location": "US",
+  "state": "NY"
+ },
+ "buffalo.edu": {
+  "code": "002925",
+  "name": "University at Buffalo-SUNY",
+  "location": "US",
+  "state": "NY"
+ },
+ "nyu.edu": {
+  "code": "002562",
+  "name": "New York University",
+  "location": "US",
+  "state": "NY"
+ },
+ "cornell.edu": {
+  "code": "002098",
+  "name": "Cornell University-NY",
+  "location": "US",
+  "state": "NY"
+ },
+ "syracuse.edu": {
+  "code": "002823",
+  "name": "Syracuse University-NY",
+  "location": "US",
+  "state": "NY"
+ },
+ "rit.edu": {
+  "code": "002760",
+  "name": "Rochester Inst of Tech-NY",
+  "location": "US",
+  "state": "NY"
+ },
+ "uconn.edu": {
+  "code": "003915",
+  "name": "Univ of Connecticut",
+  "location": "US",
+  "state": "CT"
+ },
+ "umass.edu": {
+  "code": "003917",
+  "name": "Univ of Massachusetts/Amherst",
+  "location": "US",
+  "state": "MA"
+ },
+ "bu.edu": {
+  "code": "003087",
+  "name": "Boston University-MA",
+  "location": "US",
+  "state": "MA"
+ },
+ "northeastern.edu": {
+  "code": "003667",
+  "name": "Northeastern University-MA",
+  "location": "US",
+  "state": "MA"
+ }
+}
