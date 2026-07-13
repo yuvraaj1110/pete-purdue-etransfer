@@ -44,9 +44,14 @@ function clearUi(): void {
     [...shadowRootRef.querySelectorAll(".chip, .card")].forEach((n) => n.remove());
 }
 
+/** Stray clicks/deselects dismiss only the chip — a result card stays until ✕. */
+function clearChips(): void {
+  shadowRootRef && [...shadowRootRef.querySelectorAll(".chip")].forEach((n) => n.remove());
+}
+
 function showChip(x: number, y: number, text: string): void {
   const shadow = ensureShadow();
-  clearUi();
+  clearChips();
   const chip = document.createElement("button");
   chip.className = "chip";
   chip.textContent = "Purdue transfer? ▸";
@@ -144,7 +149,7 @@ document.addEventListener("mouseup", (ev) => {
   if (ev.target instanceof Node && shadowHost?.contains(ev.target)) return;
   const sel = window.getSelection()?.toString() ?? "";
   if (sel.trim().length >= 5 && /\d/.test(sel)) showChip(ev.clientX, ev.clientY, sel);
-  else clearUi();
+  else clearChips();
 });
 
 chrome.runtime.onMessage.addListener((msg) => {
