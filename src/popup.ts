@@ -1,4 +1,5 @@
 import { sendBg } from "./messages";
+import { parseCourseFromText } from "./parser";
 import { searchSchoolIndex, SCHOOL_INDEX, type IndexedSchool } from "./school-index";
 import type { TransferReport, TransferResult } from "./types";
 
@@ -57,15 +58,9 @@ async function syncToSelectedSchool(): Promise<IndexedSchool | null> {
 }
 
 function parseCourseLines(text: string): { subject: string; number: string }[] {
-  return text
-    .split(/[\n,;]+/)
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((l) => {
-      const m = l.toUpperCase().match(/([A-Z]{2,5})[\s\-–—]*(\d{2,3}[A-Z]{0,2})/);
-      return m ? { subject: m[1]!, number: m[2]! } : null;
-    })
-    .filter((c): c is { subject: string; number: string } => c !== null);
+  // Single source of truth: the same parser the content script and background
+  // use (a second regex here is how 4-digit numbers stayed broken in one path).
+  return parseCourseFromText(text).map((r) => ({ subject: r.subject, number: r.number }));
 }
 
 function verdictLabel(v: TransferResult["verdict"]): string {

@@ -142,11 +142,27 @@ export function parseAjaxList(body: string): { label: string; value: string }[] 
 
 /**
  * Extract course refs from messy highlighted text.
- * Handles: "CSCI 240", "CS-240", "CSCI240", "CSCI 111H",
- * "Computer Science 240 — Data Structures" (via subject-word fallback), lists.
- * Always returns strings; UI must allow manual correction.
+ * Handles: "CSCI 240", "CS-240", "CSCI240", "CSCI 111H", 4-digit numbering
+ * ("PSYCH 1100", "COP 3502" — OSU/UCF/Texas style), long subjects
+ * ("COMPSCI 61A"), lists. Always returns strings; UI must allow correction.
  */
-const COURSE_RE = /\b([A-Z]{2,5})[\s\-–—]?(\d{2,3}[A-Z]{0,2})\b/g;
+const COURSE_RE = /\b([A-Z]{2,8})[\s\-–—]?(\d{2,4}[A-Z]{0,2})\b/g;
+
+/**
+ * Words that precede numbers in ordinary prose but are never course subjects.
+ * Load-bearing: without this, widening the regex makes "Fall 2024" a course
+ * and the highlight chip pops on "Room 204" in Gmail (bug #9 in hardest-bugs).
+ */
+const NOISE_SUBJECTS = new Set([
+  "AT", "IN", "ON", "TO", "OF", "BY", "OR", "AND", "THE", "FOR", "PER", "VS",
+  "FALL", "SPRING", "SUMMER", "WINTER", "TERM", "SEMESTER", "YEAR", "SESSION",
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "SEPT", "OCT", "NOV", "DEC",
+  "MON", "TUE", "TUES", "WED", "THU", "THURS", "FRI", "SAT", "SUN",
+  "ROOM", "RM", "BLDG", "BUILDING", "HALL", "FLOOR", "SUITE", "STE", "APT", "UNIT", "BOX",
+  "PAGE", "PG", "CH", "CHAPTER", "SEC", "SECTION", "VOL", "NO", "NUM", "ITEM", "STEP",
+  "AGE", "GPA", "EST", "AM", "PM", "MIN", "MAX", "TOP", "ZIP", "EXT", "FAX", "TEL", "PHONE",
+  "GRADE", "LEVEL", "WEEK", "DAY", "COVID", "CREDIT", "CREDITS", "COST", "PRICE", "TOTAL",
+]);
 
 export function parseCourseFromText(raw: string): CourseRef[] {
   const text = raw.replace(/\s+/g, " ").trim();
@@ -157,6 +173,7 @@ export function parseCourseFromText(raw: string): CourseRef[] {
   for (const m of upper.matchAll(COURSE_RE)) {
     const subject = m[1]!;
     const number = m[2]!;
+    if (NOISE_SUBJECTS.has(subject)) continue;
     const key = `${subject} ${number}`;
     if (seen.has(key)) continue;
     seen.add(key);

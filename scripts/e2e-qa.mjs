@@ -134,6 +134,22 @@ try {
     `NONE=${noneCount} UNKNOWN=${unkCount}`);
   const evalLink = await popup.locator(".card.NONE .caveats").first().textContent();
   check("NONE card offers evaluation contact", /transfercredit@purdue\.edu/.test(evalLink ?? ""));
+
+  // ================= F. Bug #9 regression: 4-digit course at OSU =================
+  await popup.fill("#schoolSearch", "ohio state");
+  await popup.waitForTimeout(300);
+  await popup.selectOption("#school", "0");
+  await popup.fill("#courses", "PSYCH 1100");
+  await popup.click("#check");
+  await popup.waitForFunction(
+    () => document.querySelector("#results .card")?.textContent?.includes("PSYCH 1100"),
+    undefined,
+    { timeout: 45_000 },
+  );
+  const osuCard = await popup.locator("#results .card").first().textContent();
+  check("4-digit course parses and resolves (OSU PSYCH 1100 -> PSY 12000)",
+    /Direct credit/.test(osuCard ?? "") && /PSY 12000/.test(osuCard ?? ""),
+    (osuCard ?? "").slice(0, 80));
 } finally {
   await context.close();
 }

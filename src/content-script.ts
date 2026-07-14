@@ -1,4 +1,5 @@
 import { sendBg } from "./messages";
+import { parseCourseFromText } from "./parser";
 import type { TransferReport } from "./types";
 
 /**
@@ -165,9 +166,15 @@ async function runCheckInner(text: string, x: number, y: number): Promise<void> 
 document.addEventListener("mouseup", (ev) => {
   // ignore clicks on our own UI
   if (ev.target instanceof Node && shadowHost?.contains(ev.target)) return;
-  const sel = window.getSelection()?.toString() ?? "";
-  if (sel.trim().length >= 5 && /\d/.test(sel)) showChip(ev.clientX, ev.clientY, sel);
-  else clearChips();
+  // Chip only when the selection actually parses as a course — "Meeting at
+  // 10:30" on Gmail must never trigger it (bug #9). Cap length so select-all
+  // on a huge page doesn't burn cycles on every mouseup.
+  const sel = (window.getSelection()?.toString() ?? "").slice(0, 4000);
+  if (sel.trim().length >= 5 && parseCourseFromText(sel).length > 0) {
+    showChip(ev.clientX, ev.clientY, sel);
+  } else {
+    clearChips();
+  }
 });
 
 chrome.runtime.onMessage.addListener((msg) => {

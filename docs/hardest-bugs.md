@@ -37,7 +37,7 @@
    a module variable. Symptom looked like "button ignores clicks" — it was actually a TypeError
    on the re-render path.
 
-9. **[OPEN — must fix before store submission] 4-digit course numbers don't parse.**
+9. **[FIXED v0.2.4] 4-digit course numbers don't parse.**
    `parseCourse()` caps numbers at `\d{2,3}`, so `PSYCH 1100` (Ohio State), `COP 3502` (UCF),
    `CS 1110` (Cornell), `ENGL 1301` (every Texas school) all return NO MATCH — verified against
    the live regex 2026-07-13. Ohio State, UCF, ASU, Cornell, TAMU, and most Florida/Texas

@@ -170,6 +170,39 @@ describe("parseCourseFromText", () => {
     expect(parseCourseFromText("hello world, nothing here")).toEqual([]);
   });
 
+  // Bug #9: 4-digit numbering (OSU/UCF/Cornell/Texas) and long subjects
+  it.each([
+    ["PSYCH 1100", "PSYCH", "1100"],
+    ["COP 3502", "COP", "3502"],
+    ["CS 1110", "CS", "1110"],
+    ["ENGL 1301", "ENGL", "1301"],
+    ["MATH 2413", "MATH", "2413"],
+    ["COMPSCI 61A", "COMPSCI", "61A"],
+    ["BIOSC 0150", "BIOSC", "0150"],
+  ])("parses 4-digit / long-subject form %s", (raw, subject, number) => {
+    expect(parseCourseFromText(raw)[0]).toMatchObject({ subject, number });
+  });
+
+  // Bug #9 guard: prose numbers must NOT become courses (chip false positives)
+  it.each([
+    "Meeting at 10:30",
+    "Fall 2024 Schedule",
+    "Spring 2025 registration",
+    "Room 204 Building 3",
+    "Chapter 12, page 340",
+    "Est. 1869 — GPA 3.8",
+    "Dec 2026 term, week 15",
+    "Total credits 120",
+  ])("rejects prose: %s", (raw) => {
+    expect(parseCourseFromText(raw)).toEqual([]);
+  });
+
+  it("still finds real courses embedded in noisy prose", () => {
+    const refs = parseCourseFromText("Fall 2024: take PSYCH 1100 in Room 204");
+    expect(refs).toHaveLength(1);
+    expect(refs[0]).toMatchObject({ subject: "PSYCH", number: "1100" });
+  });
+
   it("glued form has lower confidence than separated form", () => {
     const [glued] = parseCourseFromText("CSCI240");
     const [spaced] = parseCourseFromText("CSCI 240");
