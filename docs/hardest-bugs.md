@@ -36,3 +36,20 @@
    highlight chip's click handler crashed before drawing anything. Fix: keep the ShadowRoot in
    a module variable. Symptom looked like "button ignores clicks" — it was actually a TypeError
    on the re-render path.
+
+9. **[OPEN — must fix before store submission] 4-digit course numbers don't parse.**
+   `parseCourse()` caps numbers at `\d{2,3}`, so `PSYCH 1100` (Ohio State), `COP 3502` (UCF),
+   `CS 1110` (Cornell), `ENGL 1301` (every Texas school) all return NO MATCH — verified against
+   the live regex 2026-07-13. Ohio State, UCF, ASU, Cornell, TAMU, and most Florida/Texas
+   schools use 4-digit numbering, so v0.2.3's 130-school auto-detect made this reachable by
+   roughly half the target audience: we detect their school, then fail to read every course on
+   their catalog. User path: install → highlight `COP 3502` → "Couldn't find a course" →
+   uninstall. A feature shipped yesterday turned a dormant parser limit into the #1 launch risk.
+
+   Fix plan (interacting pieces — do together, not piecemeal):
+   - widen number to `\d{2,4}` and subject to `[A-Z]{2,8}` (`COMPSCI 61A` also fails today);
+   - add a term/noise-word guard (FALL, SPRING, SUMMER, ROOM, BLDG, YEAR…) — widening alone
+     makes "Fall 2024" parse as a course, worsening the existing chip false-positive problem
+     ("Meeting at 10:30" → "AT 10", "Room 204" → "ROOM 204", both verified);
+   - gate the content-script chip on an actual parseCourse() hit instead of "any 5+ chars with
+     a digit", so the chip stops appearing on Gmail/Docs selections.
