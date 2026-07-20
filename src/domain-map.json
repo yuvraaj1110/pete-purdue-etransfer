@@ -11,6 +11,12 @@
   "location": "US",
   "state": "IN"
  },
+ "indiana.edu": {
+  "code": "001324",
+  "name": "Indiana University Bloomington",
+  "location": "US",
+  "state": "IN"
+ },
  "iupui.edu": {
   "code": "001325",
   "name": "Indiana University Indianapolis",

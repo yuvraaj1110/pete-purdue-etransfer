@@ -17,6 +17,7 @@ const PINS = [
   // Indiana locals
   ["ivytech.edu", "IN", "Ivy Tech Community College-IN"],
   ["iu.edu", "IN", "Indiana University Bloomington"],
+  ["indiana.edu", "IN", "Indiana University Bloomington"], // IU's legacy domain, still used for bulletins/registrar
   ["iupui.edu", "IN", "Indiana University Indianapolis"],
   ["indstate.edu", "IN", "Indiana State Univ Terre Haute"],
   ["bsu.edu", "IN", "Ball State Univ Muncie-IN"],
