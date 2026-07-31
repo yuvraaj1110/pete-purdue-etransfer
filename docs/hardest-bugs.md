@@ -53,3 +53,20 @@
      ("Meeting at 10:30" → "AT 10", "Room 204" → "ROOM 204", both verified);
    - gate the content-script chip on an actual parseCourse() hit instead of "any 5+ chars with
      a digit", so the chip stops appearing on Gmail/Docs selections.
+
+10. **[FIXED v0.2.6] The chip fired on any highlighted text — casing was the missing signal.**
+    v0.2.4 gated the chip on "does this parse as a course?", which was necessary but not
+    sufficient: `parseCourseFromText` uppercases the whole selection *before* matching, so every
+    prose word became a candidate subject. Verified false positives: "Windows 11", "iPhone 15",
+    "Boeing 747", "Route 66", "Apollo 11", "Area 51", "Form 1040", "HTTP 404", "ISO 9001".
+    A noise-word blocklist can never close this — the space of capitalized-word-then-number is
+    unbounded. Structural fix: course codes are written ALL-CAPS in catalogs, so the chip now
+    requires the subject to be uppercase *in the source text* (`requireUppercaseSubject`).
+    Lookups the user explicitly requests (typed into the popup, context menu) stay lenient.
+    Lesson: normalizing input before validating it destroys the evidence validation needs.
+
+11. **[FIXED v0.2.6] Letter-prefixed course numbers never parsed.** IU writes `MATH-M 211`;
+    Purdue stores it as subject `MATH` / course `M211`. The number pattern required a leading
+    digit, so IU's entire catalog (M211, B110, D116, PSY C109) was unparseable — found while
+    verifying a demo page, not by tests. Number now accepts an optional letter prefix, possibly
+    space-separated, normalized by stripping the space. Verified live: IU MATH M211 -> MA 16500.

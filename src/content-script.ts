@@ -166,11 +166,12 @@ async function runCheckInner(text: string, x: number, y: number): Promise<void> 
 document.addEventListener("mouseup", (ev) => {
   // ignore clicks on our own UI
   if (ev.target instanceof Node && shadowHost?.contains(ev.target)) return;
-  // Chip only when the selection actually parses as a course — "Meeting at
-  // 10:30" on Gmail must never trigger it (bug #9). Cap length so select-all
-  // on a huge page doesn't burn cycles on every mouseup.
+  // Chip only when the selection contains something that really looks like a
+  // course code — ALL-CAPS subject, as catalogs write them. Anything looser
+  // pops the chip on ordinary text ("Windows 11", "Apollo 11"). Cap length so
+  // select-all on a huge page doesn't burn cycles on every mouseup.
   const sel = (window.getSelection()?.toString() ?? "").slice(0, 4000);
-  if (sel.trim().length >= 5 && parseCourseFromText(sel).length > 0) {
+  if (sel.trim().length >= 5 && parseCourseFromText(sel, { requireUppercaseSubject: true }).length > 0) {
     showChip(ev.clientX, ev.clientY, sel);
   } else {
     clearChips();

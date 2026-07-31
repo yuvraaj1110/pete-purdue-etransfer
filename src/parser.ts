@@ -146,7 +146,12 @@ export function parseAjaxList(body: string): { label: string; value: string }[] 
  * ("PSYCH 1100", "COP 3502" — OSU/UCF/Texas style), long subjects
  * ("COMPSCI 61A"), lists. Always returns strings; UI must allow correction.
  */
-const COURSE_RE = /\b([A-Z]{2,8})[\s\-–—]?(\d{2,4}[A-Z]{0,2})\b/g;
+/**
+ * Subject, then an optional separator, then the number — which may carry a
+ * leading letter, possibly space-separated: IU writes "MATH-M 211" and Purdue
+ * stores it as subject MATH / course M211, so the letter belongs to the number.
+ */
+const COURSE_RE = /\b([A-Z]{2,8})[\s\-–—]?([A-Z]\s?)?(\d{2,4}[A-Z]{0,2})\b/g;
 
 /**
  * Words that precede numbers in ordinary prose but are never course subjects.
@@ -162,9 +167,29 @@ const NOISE_SUBJECTS = new Set([
   "PAGE", "PG", "CH", "CHAPTER", "SEC", "SECTION", "VOL", "NO", "NUM", "ITEM", "STEP",
   "AGE", "GPA", "EST", "AM", "PM", "MIN", "MAX", "TOP", "ZIP", "EXT", "FAX", "TEL", "PHONE",
   "GRADE", "LEVEL", "WEEK", "DAY", "COVID", "CREDIT", "CREDITS", "COST", "PRICE", "TOTAL",
+  // all-caps acronyms that survive the casing check but are never course subjects
+  "HTTP", "HTTPS", "ISO", "NASA", "FBI", "CIA", "FAA", "FDA", "EPA", "IRS", "DMV", "TSA",
+  "USA", "USD", "EUR", "GBP", "PDF", "HTML", "JSON", "XML", "URL", "URI", "FAQ", "ASAP",
+  "ISBN", "ISSN", "SSN", "VIN", "GRE", "GMAT", "LSAT", "MCAT", "TOEFL", "IELTS", "PSAT",
+  "HIV", "LED", "LCD", "USB", "HDMI", "RAM", "CPU", "GPU", "SSD", "DVD", "MP3", "MP4",
+  "FPS", "RPM", "MPH", "KPH", "BMI", "PSI", "BTU", "KWH", "GDP", "CPI", "ROI", "IPO",
+  "NFL", "NBA", "MLB", "NHL", "NCAA", "ESPN", "CNN", "BBC", "NPR", "PBS", "HBO",
+  "LLC", "INC", "LTD", "VIP", "RSVP", "PO", "FYI", "TBD", "TBA", "ETC", "AKA",
 ]);
 
-export function parseCourseFromText(raw: string): CourseRef[] {
+export interface ParseOptions {
+  /**
+   * Require the subject to be ALL-CAPS in the SOURCE text (as catalogs write
+   * them: "MATH 211", "PSYCH 1100"). Without this, uppercasing the selection
+   * first turns every prose word into a candidate — "Windows 11", "iPhone 15",
+   * "Boeing 747", "Apollo 11" all parsed as courses. Use for the highlight
+   * chip (must be conservative); leave off when the user explicitly typed or
+   * requested the lookup.
+   */
+  requireUppercaseSubject?: boolean;
+}
+
+export function parseCourseFromText(raw: string, opts: ParseOptions = {}): CourseRef[] {
   const text = raw.replace(/\s+/g, " ").trim();
   const upper = text.toUpperCase();
   const seen = new Set<string>();
@@ -172,8 +197,14 @@ export function parseCourseFromText(raw: string): CourseRef[] {
 
   for (const m of upper.matchAll(COURSE_RE)) {
     const subject = m[1]!;
-    const number = m[2]!;
+    // letter prefix (if any) joins the number, space-stripped: "M 211" -> "M211"
+    const number = `${(m[2] ?? "").replace(/\s/g, "")}${m[3]!}`;
     if (NOISE_SUBJECTS.has(subject)) continue;
+    // compare against the ORIGINAL casing at the same offset
+    if (opts.requireUppercaseSubject) {
+      const original = text.slice(m.index ?? 0, (m.index ?? 0) + subject.length);
+      if (original !== subject) continue;
+    }
     const key = `${subject} ${number}`;
     if (seen.has(key)) continue;
     seen.add(key);

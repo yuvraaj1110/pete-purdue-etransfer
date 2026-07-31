@@ -203,6 +203,43 @@ describe("parseCourseFromText", () => {
     expect(refs[0]).toMatchObject({ subject: "PSYCH", number: "1100" });
   });
 
+  // Letter-prefixed numbers: IU writes "MATH-M 211"; Purdue stores MATH / M211
+  it.each([
+    ["MATH-M 211", "MATH", "M211"],
+    ["PSY C109", "PSY", "C109"],
+    ["MATH-D 116", "MATH", "D116"],
+  ])("parses letter-prefixed course numbers %s", (raw, subject, number) => {
+    expect(parseCourseFromText(raw)[0]).toMatchObject({ subject, number });
+  });
+
+  // requireUppercaseSubject: the chip gate. Uppercasing the selection before
+  // matching made every prose word a candidate; casing is the real signal.
+  describe("requireUppercaseSubject (chip gate)", () => {
+    const strict = (s: string) => parseCourseFromText(s, { requireUppercaseSubject: true });
+
+    it.each([
+      "Windows 11 update", "iPhone 15 Pro", "Boeing 747 landed", "Route 66 trip",
+      "Apollo 11 mission", "Area 51 tour", "Form 1040 taxes", "Terminal 5 gate 22",
+      "Grade 11 students", "Version 2 released", "HTTP 404 error", "ISO 9001 certified",
+    ])("does not fire on %s", (raw) => {
+      expect(strict(raw)).toEqual([]);
+    });
+
+    it.each([
+      ["MATH 211", "MATH", "211"],
+      ["PSYCH 1100 - Intro to Psychology", "PSYCH", "1100"],
+      ["MATH-M 211", "MATH", "M211"],
+      ["COP 3502", "COP", "3502"],
+    ])("still fires on real course %s", (raw, subject, number) => {
+      expect(strict(raw)[0]).toMatchObject({ subject, number });
+    });
+
+    it("lenient mode still accepts what a user typed in lowercase", () => {
+      expect(parseCourseFromText("math 211")[0]).toMatchObject({ subject: "MATH", number: "211" });
+      expect(strict("math 211")).toEqual([]);
+    });
+  });
+
   it("glued form has lower confidence than separated form", () => {
     const [glued] = parseCourseFromText("CSCI240");
     const [spaced] = parseCourseFromText("CSCI 240");
