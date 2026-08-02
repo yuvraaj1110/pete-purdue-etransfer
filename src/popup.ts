@@ -5,33 +5,31 @@ import type { TransferReport, TransferResult } from "./types";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
-const locationSel = $<HTMLSelectElement>("location");
-const stateSel = $<HTMLSelectElement>("state");
 const schoolSel = $<HTMLSelectElement>("school");
 const schoolSearch = $<HTMLInputElement>("schoolSearch");
+const selectedDiv = $<HTMLDivElement>("selected");
 const coursesTa = $<HTMLTextAreaElement>("courses");
 const checkBtn = $<HTMLButtonElement>("check");
 const resultsDiv = $<HTMLDivElement>("results");
 
-/** Global search over the bundled index — every school Purdue articulates from. */
+/**
+ * The picker runs entirely off the bundled index — no network on open. The old
+ * version fetched the state list from Purdue and re-rendered when it landed,
+ * which silently wiped whatever the user had already typed (bug #12).
+ * Each school entry carries its own location/state, so the user never picks them.
+ */
 let visibleSchools: IndexedSchool[] = [];
+let selectedSchool: IndexedSchool | null = null;
+let defaultState = "IN";
 
-async function loadStates(): Promise<void> {
-  const res = await sendBg({ kind: "AJAX_LIST", type: "states", values: [locationSel.value] });
-  if ("list" in res && res.ok) {
-    stateSel.innerHTML = "";
-    for (const s of res.list) {
-      const o = document.createElement("option");
-      o.value = s.value;
-      o.textContent = s.label;
-      if (s.value === "IN") o.selected = true;
-      stateSel.append(o);
-    }
+function showSelection(): void {
+  if (selectedSchool) {
+    selectedDiv.className = "selected";
+    selectedDiv.textContent = `Selected: ${selectedSchool.n} (${selectedSchool.s})`;
+  } else {
+    selectedDiv.className = "selected none";
+    selectedDiv.textContent = "No school selected";
   }
-}
-
-function schoolsForCurrentState(): IndexedSchool[] {
-  return SCHOOL_INDEX.filter((e) => e.l === locationSel.value && e.s === stateSel.value);
 }
 
 function renderSchools(list: IndexedSchool[]): void {
@@ -40,21 +38,22 @@ function renderSchools(list: IndexedSchool[]): void {
   list.forEach((e, i) => {
     const o = document.createElement("option");
     o.value = String(i);
-    o.textContent = e.s === stateSel.value ? e.n : `${e.n} (${e.s})`;
+    o.textContent = `${e.n} (${e.s})`;
     schoolSel.append(o);
   });
+  // Auto-select the top match so "type then press Check" just works — users
+  // reasonably expect the visible first result to be the one used.
+  if (list.length > 0) {
+    schoolSel.selectedIndex = 0;
+    selectedSchool = list[0] ?? null;
+  } else {
+    selectedSchool = null;
+  }
+  showSelection();
 }
 
-/** Selecting a search hit syncs location + state so the lookup query is correct. */
-async function syncToSelectedSchool(): Promise<IndexedSchool | null> {
-  const e = visibleSchools[Number(schoolSel.value)];
-  if (!e) return null;
-  if (locationSel.value !== e.l) {
-    locationSel.value = e.l;
-    await loadStates();
-  }
-  stateSel.value = e.s;
-  return e;
+function defaultList(): IndexedSchool[] {
+  return SCHOOL_INDEX.filter((e) => e.l === "US" && e.s === defaultState);
 }
 
 function parseCourseLines(text: string): { subject: string; number: string }[] {
@@ -112,11 +111,13 @@ function render(report: TransferReport): void {
 
 checkBtn.addEventListener("click", async () => {
   const courses = parseCourseLines(coursesTa.value);
-  const school = await syncToSelectedSchool();
+  const school = selectedSchool;
   const schoolCode = school?.c ?? "";
   const schoolName = school?.n ?? "";
   if (!courses.length || !schoolCode) {
-    resultsDiv.innerHTML = `<div class="err">Pick a school and enter at least one course like “MATH 211”.</div>`;
+    resultsDiv.innerHTML = `<div class="err">${
+      schoolCode ? "Enter at least one course like “MATH 211”." : "Search for and select your school first."
+    }</div>`;
     return;
   }
   checkBtn.disabled = true;
@@ -138,31 +139,29 @@ checkBtn.addEventListener("click", async () => {
 
 schoolSearch.addEventListener("input", () => {
   const q = schoolSearch.value.trim();
-  renderSchools(q ? searchSchoolIndex(q) : schoolsForCurrentState());
+  renderSchools(q ? searchSchoolIndex(q) : defaultList());
 });
-locationSel.addEventListener("change", async () => {
-  await loadStates();
-  renderSchools(schoolsForCurrentState());
+
+schoolSel.addEventListener("change", () => {
+  selectedSchool = visibleSchools[schoolSel.selectedIndex] ?? null;
+  showSelection();
 });
-stateSel.addEventListener("change", () => renderSchools(schoolsForCurrentState()));
 
 void (async () => {
-  // Pre-fill from active tab: detected school + any highlighted course text
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  await loadStates();
-  renderSchools(schoolsForCurrentState());
-  if (tab?.url) {
-    try {
-      const host = new URL(tab.url).hostname;
-      const res = await sendBg({ kind: "DETECT_SCHOOL", hostname: host });
-      if ("school" in res && res.ok && res.school) {
-        locationSel.value = res.school.location;
-        await loadStates();
-        stateSel.value = res.school.state;
-        renderSchools(schoolsForCurrentState());
-        const i = visibleSchools.findIndex((e) => e.c === res.school!.code);
-        if (i >= 0) schoolSel.value = String(i);
-      }
-    } catch { /* non-fatal */ }
+  // Render immediately from the bundled index; auto-detection only refines it,
+  // and never overwrites a list the user has already searched.
+  renderSchools(defaultList());
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.url) return;
+    const res = await sendBg({ kind: "DETECT_SCHOOL", hostname: new URL(tab.url).hostname });
+    if (!("school" in res) || !res.ok || !res.school) return;
+    if (schoolSearch.value.trim() !== "") return; // user is already typing — leave them alone
+    const hit = SCHOOL_INDEX.find((e) => e.c === res.school!.code) ?? null;
+    if (!hit) return;
+    defaultState = hit.s;
+    renderSchools([hit, ...SCHOOL_INDEX.filter((e) => e.l === hit.l && e.s === hit.s && e.c !== hit.c)]);
+  } catch {
+    /* auto-detect is a convenience; the picker works without it */
   }
 })();

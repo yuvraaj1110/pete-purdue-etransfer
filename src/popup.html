@@ -24,6 +24,10 @@
   .eq { margin: 4px 0 0 0; padding-left: 16px; }
   .caveats { color: #888; font-size: 11px; margin-top: 6px; }
   .summary { font-weight: 600; margin-bottom: 8px; }
+  select[size] { margin-top: 4px; }
+  .selected { margin-top: 4px; font-size: 12px; padding: 4px 6px; border-radius: 3px;
+    background: rgba(207,185,145,.25); }
+  .selected.none { background: none; color: #999; font-style: italic; }
   .disclaimer { margin-top: 10px; font-size: 11px; color: #a15c00; }
   .err { color: #c62828; }
 </style>
@@ -32,19 +36,10 @@
   <h1>Pete — Purdue e-Transfer</h1>
   <div class="sub">Does your course transfer to Purdue West Lafayette? (Unofficial)</div>
 
-  <label for="school">School</label>
-  <input id="schoolSearch" placeholder="Search school (e.g. Ivy Tech)…" autocomplete="off" />
-  <select id="school" size="1"></select>
-  <div class="row">
-    <div>
-      <label for="location">Location</label>
-      <select id="location"><option value="US" selected>US</option><option value="Outside US">Outside US</option></select>
-    </div>
-    <div>
-      <label for="state">State/Country</label>
-      <select id="state"><option value="IN" selected>Indiana</option></select>
-    </div>
-  </div>
+  <label for="schoolSearch">School</label>
+  <input id="schoolSearch" placeholder="Search 3,000+ schools — e.g. Ivy Tech, North Dakota…" autocomplete="off" />
+  <select id="school" size="6"></select>
+  <div id="selected" class="selected">No school selected</div>
 
   <label for="courses">Course(s) — one per line or comma-separated</label>
   <textarea id="courses" rows="3" placeholder="MATH 211&#10;CSCI 201&#10;CHEM 105"></textarea>

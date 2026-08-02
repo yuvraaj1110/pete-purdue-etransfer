@@ -70,3 +70,23 @@
     digit, so IU's entire catalog (M211, B110, D116, PSY C109) was unparseable — found while
     verifying a demo page, not by tests. Number now accepts an optional letter prefix, possibly
     space-separated, normalized by stripping the space. Verified live: IU MATH M211 -> MA 16500.
+
+12. **[FIXED v0.3.0] Async init silently wiped the user's school search.** The popup fetched the
+    state list from Purdue on open, then re-rendered the school list when it landed — roughly
+    3-6s later, *after* the user had already typed. Symptom reported as "doesn't select school
+    even after pressing": the search box still showed "university of north dakota" while the
+    dropdown had reverted to 48 Indiana schools. Reproduced with Playwright: results correct at
+    t=0, clobbered at t=6s. Fix: the picker now runs entirely off the bundled index (no network
+    on open), auto-detection never overwrites a non-empty search, and Location/State selects
+    were removed — each index entry already carries its own location/state, so asking the user
+    to pick them was both redundant and the source of the race. The top match is auto-selected
+    so "type, then press Check" works without touching the dropdown.
+    Lesson: async work that repaints shared UI must re-check whether the user has since acted.
+
+13. **[FIXED v0.3.0] Third-party catalog hosts defeated domain auto-detection.** UND's catalog
+    is served from `und-public.courseleaf.com`, not `und.edu`, so the mapped domain never
+    matched on the page a student is actually reading. CourseLeaf, Coursedog, SmartCatalog and
+    Acalog host catalogs for hundreds of schools this way. Fix: recognize those platform
+    domains, derive the school slug from the leftmost label (stripping `-public`, `-next`,
+    `catalog-`, …) and re-look it up as `<slug>.edu`. Unknown slugs still return null rather
+    than guessing a school.

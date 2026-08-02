@@ -49,7 +49,8 @@ try {
   await popup.waitForFunction(() => document.querySelectorAll("#school option").length > 0);
   const firstSchool = await popup.locator("#school option").first().textContent();
   check("global search finds Ivy Tech", /Ivy Tech/i.test(firstSchool ?? ""), firstSchool ?? "");
-  await popup.selectOption("#school", "0");
+  const autoSel = await popup.locator("#selected").textContent();
+  check("top match auto-selected (no manual click needed)", /Ivy Tech/i.test(autoSel ?? ""), autoSel ?? "");
   await popup.fill("#courses",
     "MATH 211, CHEM 105, CSCI 201, ENGL 111, PSYC 101, MATH 080, ENGL 063, FIRE 101, DENT 101, SOCI 111");
   await popup.click("#check");
@@ -76,8 +77,12 @@ try {
   await popup.fill("#schoolSearch", "north dakota");
   await popup.waitForTimeout(300);
   const opts = await popup.locator("#school option").allTextContents();
-  check("UND findable while state=Indiana", opts.some((o) => /Univ Of North Dakota.*\(ND\)/i.test(o)),
+  check("UND findable regardless of default state", opts.some((o) => /Univ Of North Dakota.*\(ND\)/i.test(o)),
     opts.slice(0, 3).join(" | "));
+  // bug #12: slow async init used to wipe the user's search results
+  await popup.waitForTimeout(4000);
+  const stillThere = await popup.locator("#selected").textContent();
+  check("search survives async init (no clobber)", /North Dakota/i.test(stillThere ?? ""), stillThere ?? "");
 
   // ================= C. Cache populated =================
   const stored = await sw.evaluate(() => chrome.storage.local.get(null));
@@ -119,7 +124,6 @@ try {
   await popup.bringToFront();
   await popup.fill("#schoolSearch", "ivy tech community");
   await popup.waitForTimeout(300);
-  await popup.selectOption("#school", "0");
   await popup.fill("#courses", "ZZZZ 999");
   await popup.click("#check");
   // wait for the NEW render (old batch results are still in the DOM until it lands)
@@ -138,7 +142,6 @@ try {
   // ================= F. Bug #9 regression: 4-digit course at OSU =================
   await popup.fill("#schoolSearch", "ohio state");
   await popup.waitForTimeout(300);
-  await popup.selectOption("#school", "0");
   await popup.fill("#courses", "PSYCH 1100");
   await popup.click("#check");
   await popup.waitForFunction(

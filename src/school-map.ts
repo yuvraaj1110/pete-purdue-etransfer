@@ -16,6 +16,27 @@ export interface SchoolEntry {
 
 const DOMAIN_MAP: Record<string, SchoolEntry> = rawMap as Record<string, SchoolEntry>;
 
+/**
+ * Third-party catalog platforms that host hundreds of schools' catalogs on
+ * their own domain — e.g. UND's catalog is und-public.courseleaf.com, so the
+ * school's own .edu never appears in the URL.
+ */
+const CATALOG_HOSTS = [
+  "courseleaf.com",
+  "smartcatalogiq.com",
+  "coursedog.com",
+  "acalog.com",
+  "digarc.com",
+  "elluciancloud.com",
+];
+
+/** "und-public" -> "und"; "catalog-ttu" -> "ttu" */
+function catalogSlug(label: string): string {
+  return label
+    .replace(/^(catalog|bulletin|courses?)[-_]/, "")
+    .replace(/[-_](public|next|prod|test|dev|catalog|bulletin|courses?|acalog)$/, "");
+}
+
 /** Match a hostname (or any subdomain of it) to a known school. */
 export function domainToSchool(hostname: string): SchoolEntry | null {
   const h = hostname.toLowerCase().replace(/^www\./, "");
@@ -23,6 +44,12 @@ export function domainToSchool(hostname: string): SchoolEntry | null {
   for (let i = 0; i < parts.length - 1; i++) {
     const candidate = parts.slice(i).join(".");
     const hit = DOMAIN_MAP[candidate];
+    if (hit) return hit;
+  }
+  // Third-party catalog host: derive the school slug and retry as <slug>.edu
+  if (CATALOG_HOSTS.some((host) => h.endsWith(`.${host}`)) && parts[0]) {
+    const slug = catalogSlug(parts[0]);
+    const hit = DOMAIN_MAP[`${slug}.edu`];
     if (hit) return hit;
   }
   return null;
