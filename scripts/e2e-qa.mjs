@@ -35,10 +35,22 @@ try {
   await context.route("https://www.ivytech.edu/qa-catalog/**", (route) =>
     route.fulfill({
       contentType: "text/html",
-      body: `<html><body style="font: 20px sans-serif; padding: 60px">
-        <h1>Course Catalog</h1>
-        <p id="course">MATH 211 - Calculus I</p>
-        <p>Some other content</p></body></html>`,
+      body: `<html><head><meta charset="utf-8"></head><body style="font:16px/1.6 system-ui,sans-serif;margin:0;color:#222">
+        <div style="background:#00563F;color:#fff;padding:14px 40px;font-weight:600">
+          Ivy Tech Community College &nbsp;·&nbsp; Course Catalog 2026–27</div>
+        <div style="padding:36px 40px;max-width:760px">
+          <h1 style="margin:0 0 4px;font-size:26px">Mathematics</h1>
+          <p style="color:#666;margin:0 0 26px">Associate of Science · Transfer pathway</p>
+          <div style="border:1px solid #e0e0e0;border-radius:6px;padding:18px 20px;margin-bottom:14px">
+            <p id="course" style="margin:0 0 6px;font-size:19px;font-weight:600">MATH 211 - Calculus I</p>
+            <p style="margin:0;color:#555">4 credits · Prerequisite: MATH 136 or placement.
+            Limits, derivatives, and integrals of algebraic and transcendental functions.</p>
+          </div>
+          <div style="border:1px solid #e0e0e0;border-radius:6px;padding:18px 20px">
+            <p style="margin:0 0 6px;font-size:19px;font-weight:600">MATH 212 - Calculus II</p>
+            <p style="margin:0;color:#555">4 credits · Techniques of integration, sequences and series.</p>
+          </div>
+        </div></body></html>`,
     }),
   );
 
@@ -90,25 +102,62 @@ try {
   check("results cached in chrome.storage.local", resultKeys.length >= 10, `${resultKeys.length} keys`);
 
   // ================= D. Highlight flow on 'ivytech.edu' =================
+  // Clear the key first so a stale entry from the batch above cannot make the
+  // chip-click assertion pass falsely.
+  await sw.evaluate(() => chrome.storage.local.remove("r:003825:MATH:211"));
+
   const page = await context.newPage();
   await page.goto("https://www.ivytech.edu/qa-catalog/math.html");
-  // Select via a REAL mouse gesture. Synthetic events are deliberately ignored
-  // now (security-review finding 1), and a trusted gesture is what users do.
   const rect = await page.evaluate(() => {
     const r = document.getElementById("course").getBoundingClientRect();
     return { x: r.x, y: r.y, w: r.width, h: r.height };
   });
-  await page.mouse.move(rect.x + 2, rect.y + rect.h / 2);
-  await page.mouse.down();
-  await page.mouse.move(rect.x + rect.w - 2, rect.y + rect.h / 2, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(600);
+  const upX = rect.x + rect.w - 2;
+  const upY = rect.y + rect.h / 2;
+  // Real mouse drag; synthetic events are deliberately ignored (security finding 1).
+  // Note: mousedown *inside* an existing selection starts a text drag in Chrome,
+  // so always collapse the selection before re-selecting.
+  const select = async () => {
+    await page.evaluate(() => getSelection()?.removeAllRanges());
+    await page.mouse.click(5, 5);
+    await page.mouse.move(rect.x + 2, upY);
+    await page.mouse.down();
+    await page.mouse.move(upX, upY, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(500);
+  };
+
+  await select();
   await page.screenshot({ path: `${SHOTS}/highlight-chip.png` });
+  check("chip appears on a real selection gesture",
+    await page.evaluate(() => !!document.querySelector('div[id^="ptc-"]')));
 
-  const chipShown = await page.evaluate(() => !!document.querySelector('div[id^="ptc-"]'));
-  check("chip appears on a real selection gesture", chipShown);
+  // Click the chip: it renders at (min(upX, vw-160), upY+8), ~26px tall.
+  const clickX = Math.min(upX, 1280 - 160) + 55;
+  const clickY = upY + 8 + 13;
+  check("chip is hit-testable at its rendered position",
+    await page.evaluate(([x, y]) => {
+      const el = document.elementFromPoint(x, y);
+      return !!el && /^ptc-/.test(el.id);
+    }, [clickX, clickY]));
+  await page.mouse.click(clickX, clickY);
 
-  // A hostile page must NOT be able to induce the UI (fingerprinting probe)
+  let landed = false;
+  for (let i = 0; i < 30 && !landed; i++) {
+    await page.waitForTimeout(500);
+    landed = await sw.evaluate(async () =>
+      Object.keys(await chrome.storage.local.get(null)).includes("r:003825:MATH:211"));
+  }
+  check("chip click performed a real lookup (cache key written fresh)", landed);
+  await page.waitForTimeout(800);
+  await page.screenshot({ path: `${SHOTS}/highlight-card.png` });
+  check("result card is painted where the chip was",
+    await page.evaluate(([x, y]) => {
+      const el = document.elementFromPoint(x, y + 30); // card is taller than the chip
+      return !!el && /^ptc-/.test(el.id);
+    }, [clickX, clickY]));
+
+  // ---- hostile-page probes, run last so they can't disturb the flow above ----
   const synthetic = await page.evaluate(() => {
     document.querySelector('div[id^="ptc-"]')?.remove();
     const el = document.getElementById("course");
@@ -124,19 +173,6 @@ try {
   check("synthetic events cannot induce our UI (no fingerprinting)", synthetic === false);
   check("host element id is randomized (not a fixed fingerprint)",
     !(await page.evaluate(() => !!document.getElementById("purdue-transfer-check-root"))));
-
-  // re-select for real and click the chip to exercise the full lookup path
-  await page.mouse.move(rect.x + 2, rect.y + rect.h / 2);
-  await page.mouse.down();
-  await page.mouse.move(rect.x + rect.w - 2, rect.y + rect.h / 2, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(500);
-  await page.mouse.click(Math.min(rect.x + rect.w, 1280 - 160) + 40, rect.y + rect.h + 8 + 14);
-  await page.waitForTimeout(6000);
-  await page.screenshot({ path: `${SHOTS}/highlight-card.png` });
-  const stored2 = await sw.evaluate(() => chrome.storage.local.get(null));
-  check("highlight lookup reached the live/cache path (MATH 211 key exists)",
-    Object.keys(stored2).some((k) => k === "r:003825:MATH:211"));
 
   // ================= E. Nonsense course -> clean NONE =================
   await popup.bringToFront();
