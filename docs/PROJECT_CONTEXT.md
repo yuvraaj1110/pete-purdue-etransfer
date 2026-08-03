@@ -31,7 +31,7 @@ graded transfer report in seconds. No backend, no API keys, no paid infrastructu
 │  SERVICE WORKER (background.ts) — the orchestrator                         │
 │   ├─ request queue + token-bucket throttle (1 req/s, burst 3)             │
 │   ├─ TransferClient: builds mod_plsql array-bound POST, retry w/ backoff  │
-│   ├─ CacheLayer: chrome.storage.local, keyed hash, 30-day TTL, LRU evict  │
+│   ├─ CacheLayer: storage.local, 30-day TTL, LRU evict (cap 2000)         │
 │   ├─ SchoolRegistry: per-state school list via p_ajax, cached             │
 │   └─ dispatch → OffscreenParser                                            │
 └──────────────┬──────────────────────────────────┬─────────────────────────┘

@@ -92,32 +92,50 @@ try {
   // ================= D. Highlight flow on 'ivytech.edu' =================
   const page = await context.newPage();
   await page.goto("https://www.ivytech.edu/qa-catalog/math.html");
-  // select the course text and fire mouseup like a real drag-select
-  const box = await page.locator("#course").boundingBox();
-  const pos = await page.evaluate(() => {
-    const el = document.getElementById("course");
-    const range = document.createRange();
-    range.selectNodeContents(el.firstChild);
-    const sel = getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    const r = range.getBoundingClientRect();
-    document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: r.right, clientY: r.bottom }));
-    return { x: r.right, y: r.bottom };
+  // Select via a REAL mouse gesture. Synthetic events are deliberately ignored
+  // now (security-review finding 1), and a trusted gesture is what users do.
+  const rect = await page.evaluate(() => {
+    const r = document.getElementById("course").getBoundingClientRect();
+    return { x: r.x, y: r.y, w: r.width, h: r.height };
   });
-  await page.waitForTimeout(500);
+  await page.mouse.move(rect.x + 2, rect.y + rect.h / 2);
+  await page.mouse.down();
+  await page.mouse.move(rect.x + rect.w - 2, rect.y + rect.h / 2, { steps: 8 });
+  await page.mouse.up();
+  await page.waitForTimeout(600);
   await page.screenshot({ path: `${SHOTS}/highlight-chip.png` });
-  // chip renders at (min(x, w-160), y+8), ~28px tall — click its center
-  await page.mouse.click(Math.min(pos.x, 1280 - 160) + 40, pos.y + 8 + 14);
-  // real Purdue lookup happens now
+
+  const chipShown = await page.evaluate(() => !!document.querySelector('div[id^="ptc-"]'));
+  check("chip appears on a real selection gesture", chipShown);
+
+  // A hostile page must NOT be able to induce the UI (fingerprinting probe)
+  const synthetic = await page.evaluate(() => {
+    document.querySelector('div[id^="ptc-"]')?.remove();
+    const el = document.getElementById("course");
+    const r = document.createRange();
+    r.selectNodeContents(el.firstChild);
+    getSelection().removeAllRanges();
+    getSelection().addRange(r);
+    document.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, clientX: 5, clientY: 5 }));
+    return new Promise((res) =>
+      setTimeout(() => res(!!document.querySelector('div[id^="ptc-"]')), 400),
+    );
+  });
+  check("synthetic events cannot induce our UI (no fingerprinting)", synthetic === false);
+  check("host element id is randomized (not a fixed fingerprint)",
+    !(await page.evaluate(() => !!document.getElementById("purdue-transfer-check-root"))));
+
+  // re-select for real and click the chip to exercise the full lookup path
+  await page.mouse.move(rect.x + 2, rect.y + rect.h / 2);
+  await page.mouse.down();
+  await page.mouse.move(rect.x + rect.w - 2, rect.y + rect.h / 2, { steps: 8 });
+  await page.mouse.up();
+  await page.waitForTimeout(500);
+  await page.mouse.click(Math.min(rect.x + rect.w, 1280 - 160) + 40, rect.y + rect.h + 8 + 14);
   await page.waitForTimeout(6000);
-  const shot = `${SHOTS}/highlight-card.png`;
-  await page.screenshot({ path: shot });
-  // closed shadow root: assert via the host element being present + card pixels via SW cache side-effect
-  const hostThere = await page.evaluate(() => !!document.getElementById("purdue-transfer-check-root"));
-  check("content-script UI injected on catalog page", hostThere);
+  await page.screenshot({ path: `${SHOTS}/highlight-card.png` });
   const stored2 = await sw.evaluate(() => chrome.storage.local.get(null));
-  check("highlight lookup hit cache/live path (MATH 211 key exists)",
+  check("highlight lookup reached the live/cache path (MATH 211 key exists)",
     Object.keys(stored2).some((k) => k === "r:003825:MATH:211"));
 
   // ================= E. Nonsense course -> clean NONE =================

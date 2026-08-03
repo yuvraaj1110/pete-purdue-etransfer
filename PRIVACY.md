@@ -12,6 +12,9 @@ Guide.
 
 - Course lookups go **directly from your browser to Purdue's public website**
   (`selfservice.mypurdue.purdue.edu`) — the same site you could visit manually. We never see them.
+  These requests are sent as URL parameters, so the course codes you look up may appear in
+  Purdue's own web-server logs alongside your IP address, exactly as they would if you used
+  their lookup page yourself.
 - Results are cached **locally in your browser** (`chrome.storage.local`) for up to 30 days,
   only so repeat lookups are fast and Purdue's servers aren't re-queried. You can clear this
   anytime by removing the extension or clearing extension storage.

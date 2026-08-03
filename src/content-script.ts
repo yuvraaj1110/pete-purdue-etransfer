@@ -12,10 +12,17 @@ let shadowHost: HTMLDivElement | null = null;
 // so it cannot be re-read from the host (this broke every second UI render).
 let shadowRootRef: ShadowRoot | null = null;
 
+/**
+ * Randomized per page load. A fixed id let any page fingerprint the extension
+ * (`document.getElementById("purdue-transfer-check-root")`) and made it trivial
+ * to style a convincing fake result card under our name. See docs/security-review.md.
+ */
+const HOST_ID = `ptc-${Math.random().toString(36).slice(2, 10)}`;
+
 function ensureShadow(): ShadowRoot {
   if (shadowHost?.isConnected && shadowRootRef) return shadowRootRef;
   shadowHost = document.createElement("div");
-  shadowHost.id = "purdue-transfer-check-root";
+  shadowHost.id = HOST_ID;
   shadowHost.style.cssText = "all: initial; position: fixed; z-index: 2147483647;";
   const shadow = shadowHost.attachShadow({ mode: "closed" });
   shadowRootRef = shadow;
@@ -164,6 +171,10 @@ async function runCheckInner(text: string, x: number, y: number): Promise<void> 
 }
 
 document.addEventListener("mouseup", (ev) => {
+  // Only real user gestures. Synthetic events (isTrusted === false) let any
+  // page induce our UI to appear and then detect it — extension fingerprinting
+  // — and burn CPU by firing mouseup in a loop. See docs/security-review.md.
+  if (!ev.isTrusted) return;
   // ignore clicks on our own UI
   if (ev.target instanceof Node && shadowHost?.contains(ev.target)) return;
   // Chip only when the selection contains something that really looks like a

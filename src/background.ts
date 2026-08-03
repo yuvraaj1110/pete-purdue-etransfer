@@ -117,6 +117,10 @@ async function doLookup(req: Extract<BgRequest, { kind: "LOOKUP" }>): Promise<Tr
     }
   }
 
+  // Bound the cache as we go — onInstalled alone never fires again for a
+  // long-lived install, so entries used to accumulate unbounded.
+  if (misses.length) void cacheSweep();
+
   const summary = {
     direct: items.filter((i) => i.verdict === "DIRECT").length,
     elective: items.filter((i) => i.verdict === "ELECTIVE").length,
@@ -166,6 +170,10 @@ chrome.runtime.onMessage.addListener((msg: BgRequest, _sender, sendResponse) => 
         case "PARSE_SELECTION":
           sendResponse({ ok: true, courses: parseCourseFromText(msg.text) });
           break;
+        default:
+          // Always answer: returning true without responding leaves the
+          // caller's promise pending forever (docs/security-review.md).
+          sendResponse({ ok: false, error: "unsupported request" });
       }
     } catch (e) {
       sendResponse({ ok: false, error: e instanceof Error ? e.message : String(e) });
@@ -176,6 +184,7 @@ chrome.runtime.onMessage.addListener((msg: BgRequest, _sender, sendResponse) => 
 
 chrome.runtime.onInstalled.addListener(() => {
   void cacheSweep();
+  chrome.contextMenus.removeAll();
   chrome.contextMenus.create({
     id: "ptc-check",
     title: "Check Purdue transfer credit for \"%s\"",

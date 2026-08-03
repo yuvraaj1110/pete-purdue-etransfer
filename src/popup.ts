@@ -72,6 +72,15 @@ function verdictLabel(v: TransferResult["verdict"]): string {
   }[v];
 }
 
+/** Error text is never trusted as markup — it can carry upstream strings. */
+function showError(message: string): void {
+  resultsDiv.textContent = "";
+  const div = document.createElement("div");
+  div.className = "err";
+  div.textContent = message;
+  resultsDiv.append(div);
+}
+
 function render(report: TransferReport): void {
   resultsDiv.innerHTML = "";
   const s = report.summary;
@@ -86,8 +95,13 @@ function render(report: TransferReport): void {
   for (const item of report.items) {
     const card = document.createElement("div");
     card.className = `card ${item.verdict}`;
+    // textContent, not innerHTML: safe today only because the parser constrains
+    // subject/number to [A-Z0-9]; don't leave that as the only thing holding.
     const title = document.createElement("div");
-    title.innerHTML = `<span class="v">${item.source.subject} ${item.source.number}</span> — ${verdictLabel(item.verdict)}`;
+    const code = document.createElement("span");
+    code.className = "v";
+    code.textContent = `${item.source.subject} ${item.source.number}`;
+    title.append(code, ` — ${verdictLabel(item.verdict)}`);
     card.append(title);
 
     if (item.equivalencies.length) {
@@ -115,9 +129,9 @@ checkBtn.addEventListener("click", async () => {
   const schoolCode = school?.c ?? "";
   const schoolName = school?.n ?? "";
   if (!courses.length || !schoolCode) {
-    resultsDiv.innerHTML = `<div class="err">${
-      schoolCode ? "Enter at least one course like “MATH 211”." : "Search for and select your school first."
-    }</div>`;
+    showError(
+      schoolCode ? "Enter at least one course like “MATH 211”." : "Search for and select your school first.",
+    );
     return;
   }
   checkBtn.disabled = true;
@@ -128,9 +142,9 @@ checkBtn.addEventListener("click", async () => {
       schoolCode, schoolName, courses,
     });
     if ("report" in res && res.ok) render(res.report);
-    else resultsDiv.innerHTML = `<div class="err">${"error" in res ? res.error : "Lookup failed"}</div>`;
+    else showError("error" in res ? res.error : "Lookup failed");
   } catch (e) {
-    resultsDiv.innerHTML = `<div class="err">${e instanceof Error ? e.message : String(e)}</div>`;
+    showError(e instanceof Error ? e.message : String(e));
   } finally {
     checkBtn.disabled = false;
     checkBtn.textContent = "Check transfer credit";
